@@ -1,21 +1,39 @@
 {
-  "time": "2026-10-03T07:38:03+0800",
+  "time": "2026-10-03T07:41:04+0800",
   "jobs": {
     "S01_baseline": {
       "train": {
+        "status": "done",
+        "progress": {
+          "step": 40,
+          "total": 40,
+          "timing": "53:33<00:00, 80.34s/it"
+        }
+      },
+      "predict": {
         "status": "running",
         "progress": {
-          "step": 39,
+          "step": 8,
+          "total": 8,
+          "timing": "00:32<00:00,  4.09s/it"
+        }
+      }
+    },
+    "S02_evidence_first": {
+      "train": {
+        "status": "running",
+        "progress": {
+          "step": 0,
           "total": 40,
-          "timing": "52:16<01:18, 78.98s/it"
+          "timing": "00:00<?, ?it/s"
         }
       }
     }
   },
   "scores": {},
   "alerts": [],
-  "gpu": "0, 22117 MiB, 100 %\n1, 15 MiB, 0 %",
+  "gpu": "0, 20973 MiB, 100 %\n1, 11955 MiB, 18 %",
   "queue_alive": true,
   "maintenance": false,
-  "published_at": "2026-10-02T23:38:17.510693+00:00"
+  "published_at": "2026-10-02T23:41:20.494027+00:00"
 }
