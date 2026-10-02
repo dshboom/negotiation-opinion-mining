@@ -1,0 +1,130 @@
+{
+  "id": "postprocess",
+  "title": "后处理结果 · ⑥立场 / ⑦k扫描 / ⑧去重",
+  "phase": "后处理",
+  "experiments": [
+    "E4",
+    "E5",
+    "E6"
+  ],
+  "desc": "复用已存盘预测的离线后处理扫描。基线 r32 综合 0.5527 / F1 0.7182。只有 ⑥ 立场校准有正收益。",
+  "columns": [
+    {
+      "key": "direction",
+      "label": "方向"
+    },
+    {
+      "key": "scheme",
+      "label": "方案"
+    },
+    {
+      "key": "composite",
+      "label": "综合",
+      "num": true,
+      "primary": true
+    },
+    {
+      "key": "delta",
+      "label": "Δ vs 基线",
+      "num": true
+    },
+    {
+      "key": "verdict",
+      "label": "结论"
+    }
+  ],
+  "viz": [
+    {
+      "type": "bar",
+      "title": "综合分",
+      "labelKey": "scheme",
+      "valueKey": "composite"
+    }
+  ],
+  "rows": [
+    {
+      "direction": "⑥",
+      "scheme": "全局先验匹配",
+      "composite": 0.5678,
+      "delta": 0.0151,
+      "verdict": "✅ 最佳，已采用"
+    },
+    {
+      "direction": "⑥",
+      "scheme": "按 doc_type 先验匹配",
+      "composite": 0.5661,
+      "delta": 0.0134,
+      "verdict": "✅ 次优"
+    },
+    {
+      "direction": "⑥",
+      "scheme": "train-calib F1 最优",
+      "composite": 0.5638,
+      "delta": 0.0111,
+      "verdict": "✅（in-sample，偏乐观）"
+    },
+    {
+      "direction": "⑧",
+      "scheme": "去重 0.85",
+      "composite": 0.5489,
+      "delta": -0.0038,
+      "verdict": "❌ 无增益"
+    },
+    {
+      "direction": "⑧",
+      "scheme": "去重 0.90",
+      "composite": 0.5503,
+      "delta": -0.0024,
+      "verdict": "❌ 无增益"
+    },
+    {
+      "direction": "⑧",
+      "scheme": "去重 0.93",
+      "composite": 0.5503,
+      "delta": -0.0024,
+      "verdict": "❌ 无增益"
+    },
+    {
+      "direction": "⑧",
+      "scheme": "去重 0.96",
+      "composite": 0.5523,
+      "delta": -0.0004,
+      "verdict": "❌ 无增益"
+    },
+    {
+      "direction": "⑦",
+      "scheme": "k=3",
+      "composite": 0.4387,
+      "delta": -0.114,
+      "verdict": "❌ 无增益"
+    },
+    {
+      "direction": "⑦",
+      "scheme": "k=4",
+      "composite": 0.5104,
+      "delta": -0.0423,
+      "verdict": "❌ 无增益"
+    },
+    {
+      "direction": "⑦",
+      "scheme": "k=5",
+      "composite": 0.5527,
+      "delta": 0.0,
+      "verdict": "❌ =基线"
+    },
+    {
+      "direction": "⑦",
+      "scheme": "k=6",
+      "composite": 0.5527,
+      "delta": 0.0,
+      "verdict": "❌ =基线"
+    },
+    {
+      "direction": "⑦",
+      "scheme": "k=7",
+      "composite": 0.5527,
+      "delta": 0.0,
+      "verdict": "❌ =基线"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "field_dict",
+  "title": "评分字段字典",
+  "phase": "方法论",
+  "experiments": [
+    "E12"
+  ],
+  "desc": "评测口径中每个字段的准确定义，便于复现与核对。",
+  "columns": [
+    {
+      "key": "field",
+      "label": "字段"
+    },
+    {
+      "key": "cn",
+      "label": "中文"
+    },
+    {
+      "key": "meaning",
+      "label": "含义"
+    }
+  ],
+  "viz": [],
+  "rows": [
+    {
+      "field": "NC",
+      "cn": "正确匹配数",
+      "meaning": "立场一致且 0.4×cos(议题名)+0.6×cos(证据) > 0.7 的一对一匹配数"
+    },
+    {
+      "field": "Np",
+      "cn": "预测卡片数",
+      "meaning": "模型输出的三元组总数（每篇文档由模型自由决定几张卡）"
+    },
+    {
+      "field": "Ng",
+      "cn": "金标卡片数",
+      "meaning": "参考答案的三元组总数（val 300 条共 1421）"
+    },
+    {
+      "field": "P",
+      "cn": "准确率",
+      "meaning": "NC / Np（多输出会压低）"
+    },
+    {
+      "field": "R",
+      "cn": "召回率",
+      "meaning": "NC / Ng（漏输出会压低）"
+    },
+    {
+      "field": "F1",
+      "cn": "调和平均",
+      "meaning": "2PR/(P+R)"
+    },
+    {
+      "field": "α",
+      "cn": "语义修正系数",
+      "meaning": "成功匹配对的 bert-base-chinese BERTScore-F1 均值"
+    },
+    {
+      "field": "抽取分",
+      "cn": "抽取（占 80%）",
+      "meaning": "F1 × α"
+    },
+    {
+      "field": "ROUGE-L / BERTScore",
+      "cn": "未来观点",
+      "meaning": "与金标未来论点的字面/语义相似，分母 max(Ng,Np)"
+    },
+    {
+      "field": "预测分",
+      "cn": "未来（占 20%）",
+      "meaning": "(ROUGE-L + BERTScore)/2"
+    },
+    {
+      "field": "综合分",
+      "cn": "综合",
+      "meaning": "0.8×抽取分 + 0.2×预测分"
+    }
+  ]
+}

@@ -70,6 +70,31 @@
   .foot{color:var(--muted);font-size:12.5px;text-align:center;margin-top:36px;border-top:1px solid var(--line);padding-top:16px}
   .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 13px;font-size:13px;cursor:pointer}
   .banner{background:#fffbf0;border:1px solid #f2e2bc;color:#7a5b12;border-radius:11px;padding:11px 14px;font-size:13.5px;margin-bottom:14px}
+  .ds{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .ds .hd{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+  .ds h3{margin:0;font-size:17px}
+  .ds .badges{display:flex;flex-wrap:wrap;gap:6px}
+  .badge{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--bs);color:var(--blue)}
+  .badge.ph{background:var(--ps);color:var(--purple)}
+  .ds .d{font-size:13.4px;color:#475569;margin:8px 0 4px}
+  .charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin:10px 0 4px}
+  .chart{background:#f8fbff;border:1px solid var(--line);border-radius:11px;padding:11px 13px}
+  .chart .ct{font-size:12.8px;font-weight:700;color:#33415c;margin-bottom:8px}
+  .bar-row{margin-bottom:8px;font-size:12.6px}
+  .bar-row .lbl{display:flex;justify-content:space-between;gap:8px;color:#475569;margin-bottom:3px}
+  .bar-row .lbl b{font-variant-numeric:tabular-nums;color:var(--ink)}
+  .bar-track{height:8px;background:#e8eef7;border-radius:5px;overflow:hidden}
+  .bar-track>i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#2563eb,#60a5fa)}
+  .bar-row.hot .bar-track>i{background:linear-gradient(90deg,#15a34a,#4ade80)}
+  .tblwrap{overflow-x:auto;margin-top:10px}
+  details.tbl{margin-top:8px}
+  details.tbl summary{cursor:pointer;font-size:13px;color:var(--blue);user-select:none}
+  .ds .dl{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;align-items:center}
+  .ds .dl a{background:#fff;border:1px solid var(--line);border-radius:9px;padding:6px 12px;font-size:12.8px;font-weight:700;text-decoration:none}
+  .ds .dl a.json{color:#0b6b3a;border-color:#bfe3cd}
+  .ds .dl a.csv{color:#7a3d0b;border-color:#e8d3b0}
+  .ds .dl a:hover{background:#f8fbff}
+  .ds .raw{font-size:12px;color:var(--muted);flex:1 1 260px}
 </style>
 </head>
 <body>
@@ -108,7 +133,11 @@
     </tr></thead><tbody id="results"></tbody></table>
   </div>
 
-  <h2><span class="n">4</span>实验看板</h2>
+  <h2><span class="n">4</span>结果文件 · 可视化与下载</h2>
+  <p class="sub2">每个数据集都标注了归属实验（E 编号）。展开可看明细表，点「下载 JSON / CSV」获取原始文件。数据由 <code>docs/data/results/datasets.json</code> 生成。</p>
+  <div id="datasets"></div>
+
+  <h2><span class="n">5</span>实验看板</h2>
   <p class="sub2">有效与证伪同等重要——证伪清单能避免重复踩坑。</p>
   <div class="filters" id="filters">
     <button class="on" data-f="all">全部</button>
@@ -119,13 +148,13 @@
   </div>
   <div class="exps" id="exps"></div>
 
-  <h2><span class="n">5</span>关键发现</h2>
+  <h2><span class="n">6</span>关键发现</h2>
   <div class="grid2" id="findings"></div>
 
-  <h2><span class="n">6</span>待办 / 下一步</h2>
+  <h2><span class="n">7</span>待办 / 下一步</h2>
   <div class="card todos" id="todos"></div>
 
-  <h2><span class="n">7</span>相关链接</h2>
+  <h2><span class="n">8</span>相关链接</h2>
   <div class="links" id="links"></div>
 
   <div class="foot">
@@ -240,7 +269,69 @@ function scheduleAuto(){
   if(auto) timer = setInterval(() => load(false), 5*60*1000);  // 5 分钟
 }
 
+/* ===== 结果文件（数据集）可视化与下载 ===== */
+let DATASETS = null;
+async function loadDatasets(){
+  const el = document.getElementById('datasets');
+  try{
+    const r = await fetch('./data/results/index.json?t=' + Date.now(), {cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    DATASETS = await r.json();
+    renderDatasets();
+  }catch(e){
+    if(el) el.innerHTML = '<div class="banner">⚠️ 结果文件清单加载失败（' + esc(e.message) + '）</div>';
+  }
+}
+function fmt(v){
+  if(v === null || v === undefined || v === '') return '—';
+  if(typeof v === 'number'){
+    if(Number.isInteger(v) && Math.abs(v) < 100000) return String(v);
+    return (Math.abs(v) >= 100) ? v.toFixed(0) : v.toFixed(4);
+  }
+  return esc(v);
+}
+function barChart(viz, ds){
+  const ex = viz.exclude || [];
+  const rows = ds.rows.filter(r => typeof r[viz.valueKey] === 'number' && ex.indexOf(r[viz.labelKey]) < 0);
+  const max = Math.max.apply(null, rows.map(r => Math.abs(r[viz.valueKey])).concat([0.0001]));
+  return '<div class="chart"><div class="ct">' + esc(viz.title) + '</div>' + rows.map(r => {
+    const v = r[viz.valueKey];
+    const w = Math.max(2, Math.round(Math.abs(v) / max * 100));
+    const hot = v === max;
+    return '<div class="bar-row' + (hot ? ' hot' : '') + '">' +
+      '<div class="lbl"><span>' + esc(r[viz.labelKey]) + '</span><b>' + fmt(v) + '</b></div>' +
+      '<div class="bar-track"><i style="width:' + w + '%"></i></div></div>';
+  }).join('') + '</div>';
+}
+function dsTable(ds){
+  const cols = ds.columns;
+  const head = cols.map(c => '<th' + (c.num ? ' class="n"' : '') + '>' + esc(c.label) + '</th>').join('');
+  const body = ds.rows.map(r => '<tr>' + cols.map(c => '<td' + (c.num ? ' class="n"' : '') + '>' + fmt(r[c.key]) + '</td>').join('') + '</tr>').join('');
+  return '<div class="tblwrap"><table><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+}
+function renderDatasets(){
+  if(!DATASETS) return;
+  document.getElementById('datasets').innerHTML = (DATASETS.datasets||[]).map(ds => {
+    const badges = (ds.experiments||[]).map(e => '<span class="badge">' + esc(e) + '</span>').join('');
+    const ph = ds.phase ? '<span class="badge ph">' + esc(ds.phase) + '</span>' : '';
+    const charts = (ds.viz||[]).filter(v => v.type === 'bar').map(v => barChart(v, ds)).join('');
+    const n = ds.rows.length;
+    return '<div class="ds">' +
+      '<div class="hd"><h3>' + esc(ds.title) + '</h3><div class="badges">' + ph + badges + '</div></div>' +
+      '<div class="d">' + esc(ds.desc) + '</div>' +
+      (charts ? '<div class="charts">' + charts + '</div>' : '') +
+      '<details class="tbl"><summary>查看数据表（' + n + ' 行 × ' + ds.columns.length + ' 列）</summary>' + dsTable(ds) + '</details>' +
+      '<div class="dl">' +
+        '<a class="json" href="./data/results/' + esc(ds.id) + '.json" download>⬇ 下载 JSON</a>' +
+        '<a class="csv" href="./data/results/' + esc(ds.id) + '.csv" download>⬇ 下载 CSV</a>' +
+        '<span class="raw">归属：' + esc(ds.phase||'') + ' · ' + (ds.experiments||[]).join(' / ') +
+        ' ｜ 文件：<code>docs/data/results/' + esc(ds.id) + '.{json,csv}</code></span>' +
+      '</div></div>';
+  }).join('');
+}
+
 load(false);
+loadDatasets();
 scheduleAuto();
 </script>
 </body>

@@ -1,0 +1,67 @@
+{
+  "id": "phase0_probe",
+  "title": "Phase 0 · 逐字率与命名口径探针",
+  "phase": "Phase 0 诊断",
+  "experiments": [
+    "E10b",
+    "E12"
+  ],
+  "desc": "证据逐字率、未来论点逐字率、议题名口径对比、近失对余弦拆解。用于定位「短板在口径不在理解」。",
+  "columns": [
+    {
+      "key": "metric",
+      "label": "指标"
+    },
+    {
+      "key": "gold",
+      "label": "金标"
+    },
+    {
+      "key": "model",
+      "label": "模型"
+    },
+    {
+      "key": "note",
+      "label": "说明"
+    }
+  ],
+  "viz": [],
+  "rows": [
+    {
+      "metric": "证据条目逐字率",
+      "gold": "100%",
+      "model": "99.18%",
+      "note": "模型已在逐字摘抄，仅 30 条非逐字"
+    },
+    {
+      "metric": "未来论点逐字率",
+      "gold": "0%",
+      "model": "—",
+      "note": "纯生成，copy 比例中位 0.42（模型 0.43）"
+    },
+    {
+      "metric": "议题名原文子串率",
+      "gold": "13.7%",
+      "model": "23.7%",
+      "note": "金标更抽象，模型偏贴原文"
+    },
+    {
+      "metric": "议题名最长公共子串覆盖",
+      "gold": "0.567",
+      "model": "0.655",
+      "note": "同上"
+    },
+    {
+      "metric": "近失对 cos_issue 均值",
+      "gold": "—",
+      "model": "0.52",
+      "note": "命名口径是主要短板"
+    },
+    {
+      "metric": "近失对 cos_chain 均值",
+      "gold": "—",
+      "model": "0.70",
+      "note": "证据链其实较好"
+    }
+  ]
+}

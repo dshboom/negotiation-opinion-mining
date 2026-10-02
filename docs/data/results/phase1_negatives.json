@@ -1,0 +1,108 @@
+{
+  "id": "phase1_negatives",
+  "title": "Phase 1 · 指令探针与自一致性负结果",
+  "phase": "Phase 1",
+  "experiments": [
+    "E8",
+    "E9"
+  ],
+  "desc": "在 r32+⑥（0.5678）操作点上的 Phase 1 全量负结果，证明「偏差是系统性的，投票/追加指令无法纠正」。",
+  "columns": [
+    {
+      "key": "config",
+      "label": "配置"
+    },
+    {
+      "key": "composite",
+      "label": "综合",
+      "num": true,
+      "primary": true
+    },
+    {
+      "key": "f1",
+      "label": "F1",
+      "num": true
+    },
+    {
+      "key": "nc",
+      "label": "NC",
+      "num": true
+    },
+    {
+      "key": "np",
+      "label": "Np",
+      "num": true
+    },
+    {
+      "key": "delta",
+      "label": "vs 0.5678",
+      "num": true
+    }
+  ],
+  "viz": [
+    {
+      "type": "bar",
+      "title": "综合分",
+      "labelKey": "config",
+      "valueKey": "composite"
+    }
+  ],
+  "rows": [
+    {
+      "config": "基线 T=0 贪心 + ⑥",
+      "composite": 0.5678,
+      "f1": 0.7366,
+      "nc": 1043,
+      "np": 1411,
+      "delta": 0.0
+    },
+    {
+      "config": "探针 B1（概括性命名）",
+      "composite": 0.5498,
+      "f1": 0.7134,
+      "nc": 1008,
+      "np": 1405,
+      "delta": -0.018
+    },
+    {
+      "config": "探针 B2（一议题一卡）",
+      "composite": 0.5495,
+      "f1": 0.714,
+      "nc": 1005,
+      "np": 1394,
+      "delta": -0.018
+    },
+    {
+      "config": "SC-merge F=2, thr=0.80",
+      "composite": 0.5246,
+      "f1": 0.6905,
+      "nc": 966,
+      "np": 1377,
+      "delta": -0.043
+    },
+    {
+      "config": "SC-merge F=3, thr=0.80",
+      "composite": 0.4997,
+      "f1": 0.6664,
+      "nc": 838,
+      "np": 1094,
+      "delta": -0.068
+    },
+    {
+      "config": "SC-merge F=2, thr=0.65",
+      "composite": 0.4796,
+      "f1": 0.6426,
+      "nc": 811,
+      "np": 1103,
+      "delta": -0.088
+    },
+    {
+      "config": "single-best（挑最居中样本）",
+      "composite": 0.5527,
+      "f1": 0.7265,
+      "nc": 1016,
+      "np": 1376,
+      "delta": -0.015
+    }
+  ]
+}

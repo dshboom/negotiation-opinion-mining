@@ -1,0 +1,54 @@
+{
+  "id": "speedup",
+  "title": "E3 · vLLM 无损加速实测",
+  "phase": "工程",
+  "experiments": [
+    "E3"
+  ],
+  "desc": "HF（transformers+peft）与 vLLM 0.30 在 val 300 条上的生成耗时与吞吐对比；分数差异在噪声内。",
+  "columns": [
+    {
+      "key": "item",
+      "label": "项目"
+    },
+    {
+      "key": "hf",
+      "label": "HF"
+    },
+    {
+      "key": "vllm",
+      "label": "vLLM"
+    },
+    {
+      "key": "improve",
+      "label": "提升"
+    }
+  ],
+  "viz": [],
+  "rows": [
+    {
+      "item": "val 300 纯生成",
+      "hf": "5050s（84min）",
+      "vllm": "578s（9.6min）",
+      "improve": "8.7×"
+    },
+    {
+      "item": "含引擎启动",
+      "hf": "5050s",
+      "vllm": "709s（11.8min）",
+      "improve": "7.1×"
+    },
+    {
+      "item": "吞吐（tok/s）",
+      "hf": "~61",
+      "vllm": "393",
+      "improve": "6.4×"
+    },
+    {
+      "item": "val 综合分",
+      "hf": "0.5527",
+      "vllm": "0.5538",
+      "improve": "+0.0011（无损）"
+    }
+  ]
+}

@@ -1,0 +1,259 @@
+{
+  "id": "main_results",
+  "title": "主结果 · val 300（全指标）",
+  "phase": "主线评测",
+  "experiments": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E13",
+    "探针"
+  ],
+  "desc": "14B 与 32B 在验证集 300 条上的完整评测指标。综合 = 0.8×抽取 + 0.2×未来；抽取 = F1×α。oracle 探针用于标定评分器上界。",
+  "columns": [
+    {
+      "key": "model",
+      "label": "模型 / 配置"
+    },
+    {
+      "key": "engine",
+      "label": "引擎"
+    },
+    {
+      "key": "experiment",
+      "label": "归属实验"
+    },
+    {
+      "key": "nc",
+      "label": "NC",
+      "num": true
+    },
+    {
+      "key": "np",
+      "label": "Np",
+      "num": true
+    },
+    {
+      "key": "ng",
+      "label": "Ng",
+      "num": true
+    },
+    {
+      "key": "p",
+      "label": "P",
+      "num": true
+    },
+    {
+      "key": "r",
+      "label": "R",
+      "num": true
+    },
+    {
+      "key": "f1",
+      "label": "F1",
+      "num": true
+    },
+    {
+      "key": "alpha",
+      "label": "α",
+      "num": true
+    },
+    {
+      "key": "extract",
+      "label": "抽取(80%)",
+      "num": true
+    },
+    {
+      "key": "rouge_l",
+      "label": "ROUGE-L",
+      "num": true
+    },
+    {
+      "key": "bertscore",
+      "label": "BERTScore",
+      "num": true
+    },
+    {
+      "key": "future",
+      "label": "未来(20%)",
+      "num": true
+    },
+    {
+      "key": "composite",
+      "label": "综合",
+      "num": true,
+      "primary": true
+    }
+  ],
+  "viz": [
+    {
+      "type": "bar",
+      "title": "综合分",
+      "labelKey": "model",
+      "valueKey": "composite",
+      "exclude": [
+        "探针·答案照抄（oracle 上界）",
+        "探针·整篇原文当证据"
+      ]
+    },
+    {
+      "type": "bar",
+      "title": "抽取分（80%）",
+      "labelKey": "model",
+      "valueKey": "extract",
+      "exclude": [
+        "探针·答案照抄（oracle 上界）",
+        "探针·整篇原文当证据"
+      ]
+    },
+    {
+      "type": "bar",
+      "title": "未来论点分（20%）",
+      "labelKey": "model",
+      "valueKey": "future",
+      "exclude": [
+        "探针·答案照抄（oracle 上界）",
+        "探针·整篇原文当证据"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "model": "基座·零训练",
+      "engine": "HF",
+      "experiment": "基线",
+      "nc": 767,
+      "np": 1719,
+      "ng": 1421,
+      "p": 0.446,
+      "r": 0.54,
+      "f1": 0.489,
+      "alpha": 0.764,
+      "extract": 0.373,
+      "rouge_l": 0.116,
+      "bertscore": 0.41,
+      "future": 0.263,
+      "composite": 0.3511
+    },
+    {
+      "model": "SFT LoRA r16（2 轮）",
+      "engine": "HF",
+      "experiment": "E1",
+      "nc": 1007,
+      "np": 1404,
+      "ng": 1421,
+      "p": 0.717,
+      "r": 0.709,
+      "f1": 0.713,
+      "alpha": 0.825,
+      "extract": 0.588,
+      "rouge_l": 0.214,
+      "bertscore": 0.581,
+      "future": 0.398,
+      "composite": 0.5498
+    },
+    {
+      "model": "SFT LoRA r32（2 轮）",
+      "engine": "HF",
+      "experiment": "E2",
+      "nc": 1017,
+      "np": 1411,
+      "ng": 1421,
+      "p": 0.721,
+      "r": 0.716,
+      "f1": 0.718,
+      "alpha": 0.823,
+      "extract": 0.591,
+      "rouge_l": 0.213,
+      "bertscore": 0.585,
+      "future": 0.399,
+      "composite": 0.5527
+    },
+    {
+      "model": "+ vLLM 推理加速",
+      "engine": "vLLM",
+      "experiment": "E3",
+      "nc": null,
+      "np": 1411,
+      "ng": 1421,
+      "p": null,
+      "r": null,
+      "f1": 0.72,
+      "alpha": 0.823,
+      "extract": 0.593,
+      "rouge_l": null,
+      "bertscore": null,
+      "future": 0.398,
+      "composite": 0.5538
+    },
+    {
+      "model": "+ ⑥ 立场校准 ★",
+      "engine": "vLLM",
+      "experiment": "E4",
+      "nc": 1043,
+      "np": 1411,
+      "ng": 1421,
+      "p": 0.739,
+      "r": 0.734,
+      "f1": 0.7366,
+      "alpha": 0.825,
+      "extract": 0.608,
+      "rouge_l": null,
+      "bertscore": null,
+      "future": 0.408,
+      "composite": 0.5678
+    },
+    {
+      "model": "Qwen3-32B ★ 总最佳",
+      "engine": "—",
+      "experiment": "E13",
+      "nc": null,
+      "np": null,
+      "ng": 1421,
+      "p": null,
+      "r": null,
+      "f1": 0.773,
+      "alpha": 0.849,
+      "extract": 0.665,
+      "rouge_l": null,
+      "bertscore": null,
+      "future": 0.38,
+      "composite": 0.6082
+    },
+    {
+      "model": "探针·答案照抄（oracle 上界）",
+      "engine": "—",
+      "experiment": "探针",
+      "nc": 1421,
+      "np": 1421,
+      "ng": 1421,
+      "p": 1.0,
+      "r": 1.0,
+      "f1": 1.0,
+      "alpha": 1.0,
+      "extract": 1.0,
+      "rouge_l": 1.0,
+      "bertscore": 1.0,
+      "future": 1.0,
+      "composite": 1.0
+    },
+    {
+      "model": "探针·整篇原文当证据",
+      "engine": "—",
+      "experiment": "探针",
+      "nc": 1393,
+      "np": 1421,
+      "ng": 1421,
+      "p": 0.98,
+      "r": 0.98,
+      "f1": 0.98,
+      "alpha": 0.677,
+      "extract": 0.664,
+      "rouge_l": 1.0,
+      "bertscore": 1.0,
+      "future": 1.0,
+      "composite": 0.7309
+    }
+  ]
+}

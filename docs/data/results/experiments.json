@@ -1,0 +1,171 @@
+{
+  "id": "experiments",
+  "title": "实验台账（E1–E13）",
+  "phase": "全部",
+  "experiments": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10b",
+    "E11",
+    "E12",
+    "E13"
+  ],
+  "desc": "所有已完成实验的登记表，有效与证伪同等记录。收益为相对前一基线的综合分变化（工程类为倍率）。",
+  "columns": [
+    {
+      "key": "id",
+      "label": "编号"
+    },
+    {
+      "key": "name",
+      "label": "实验"
+    },
+    {
+      "key": "phase",
+      "label": "所属阶段"
+    },
+    {
+      "key": "status",
+      "label": "状态"
+    },
+    {
+      "key": "gain",
+      "label": "收益 / 结论"
+    },
+    {
+      "key": "params",
+      "label": "参数"
+    },
+    {
+      "key": "why",
+      "label": "结论 / 原因"
+    }
+  ],
+  "viz": [],
+  "rows": [
+    {
+      "id": "E1",
+      "name": "SFT LoRA r16",
+      "phase": "主线",
+      "status": "ok",
+      "gain": "+0.1987",
+      "params": "r=16, α=32, all-linear, 2 轮, lr 1e-4, bs 1×16, len 6144",
+      "why": "微调是最大单项提升，任务可学"
+    },
+    {
+      "id": "E2",
+      "name": "SFT LoRA r32",
+      "phase": "主线",
+      "status": "ok",
+      "gain": "+0.0029",
+      "params": "r=32, α=64，其余同 E1",
+      "why": "容量已饱和 → 不再加大 rank"
+    },
+    {
+      "id": "E3",
+      "name": "vLLM 推理加速",
+      "phase": "工程",
+      "status": "ok",
+      "gain": "8.7×（任务级无损）",
+      "params": "bf16, len 8192, util 0.95, 关 FlashInfer",
+      "why": "PagedAttention + 连续批处理；0.5527→0.5538"
+    },
+    {
+      "id": "E4",
+      "name": "⑥ 立场 logit 校准",
+      "phase": "后处理",
+      "status": "ok",
+      "gain": "+0.0151",
+      "params": "b_neutral +0.7, b_oppose −0.5（全局先验）",
+      "why": "立场是硬门槛；无标签先验匹配，无泄漏 → 14B 最佳 0.5678"
+    },
+    {
+      "id": "E5",
+      "name": "⑦ 卡片数 k 扫描",
+      "phase": "后处理",
+      "status": "no",
+      "gain": "≤0",
+      "params": "按 logp 排序，k=3…7",
+      "why": "模型本就输出 4~5 张，Np≈Ng，无截断空间"
+    },
+    {
+      "id": "E6",
+      "name": "⑧ 近重复去重",
+      "phase": "后处理",
+      "status": "no",
+      "gain": "<0",
+      "params": "议题名 BGE 余弦阈值 0.85–0.96",
+      "why": "输出几乎无重复，去重误删有效卡"
+    },
+    {
+      "id": "E7",
+      "name": "Liger 融合核",
+      "phase": "工程",
+      "status": "no",
+      "gain": "≈0",
+      "params": "启用 Liger-Kernel",
+      "why": "瓶颈在 2 vCPU，不在算子层"
+    },
+    {
+      "id": "E8",
+      "name": "prompt 追加指令探针",
+      "phase": "Phase 1",
+      "status": "no",
+      "gain": "−0.018",
+      "params": "B1 概括性命名 / B2 一议题一卡",
+      "why": "固定 prompt 训练，加话属分布外扰动"
+    },
+    {
+      "id": "E9",
+      "name": "SC-merge 自一致性合并",
+      "phase": "Phase 1",
+      "status": "no",
+      "gain": "−0.043 ~ −0.088",
+      "params": "n=5, T=0.7, 聚类 thr 0.65/0.80, 频次≥2/3",
+      "why": "偏差是系统性的，投票无法纠正"
+    },
+    {
+      "id": "E10b",
+      "name": "失败归因诊断",
+      "phase": "Phase 0",
+      "status": "info",
+      "gain": "方法论",
+      "params": "复刻匹配逻辑逐张归因 + 命名口径分析",
+      "why": "378 未匹配=194+101+64+19；145 张只差 0.05~0.10"
+    },
+    {
+      "id": "E11",
+      "name": "字段加权重训",
+      "phase": "Phase 2",
+      "status": "run",
+      "gain": "待评",
+      "params": "issue_name×2, stance×3, future×2, 3 轮",
+      "why": "自定义加权交叉熵 + 1024 token 分块防 OOM"
+    },
+    {
+      "id": "E12",
+      "name": "训练/推理模式对齐",
+      "phase": "方法论",
+      "status": "info",
+      "gain": "基础",
+      "params": "enable_thinking=False；空 think 块不进 loss",
+      "why": "对齐官方 ignore_empty_think"
+    },
+    {
+      "id": "E13",
+      "name": "Qwen3-32B",
+      "phase": "更强基座",
+      "status": "ok",
+      "gain": "+0.0404",
+      "params": "另一台机器复现",
+      "why": "抽取 +0.057，但未来论点退步 −0.028"
+    }
+  ]
+}

@@ -45,6 +45,10 @@
 
 - 参照上界：答案原样提交 = **1.0000**；整篇原文当证据 = **0.7309**（用于验证评分器与暴露规则特性）。
 
+> 📦 **结果文件（JSON / CSV，可在线可视化 + 下载）**
+> 站点 [「结果文件」板块](https://dshboom.github.io/negotiation-opinion-mining/#datasets) 按实验归档了 8 个数据集：主结果全指标、实验台账（E1–E13）、后处理（⑥⑦⑧）、Phase 0 归因与探针、Phase 1 负结果、vLLM 加速实测、评分字段字典。每个数据集都标注了**归属实验（E 编号）**。
+> 文件位于 [`docs/data/results/`](docs/data/results/)（`.json` + `.csv` 成对）；修改 [`datasets.json`](docs/data/results/datasets.json) 后运行 `python scripts/export_results.py` 即可重新生成全部文件与网页清单。
+
 ---
 
 ## 核心发现
