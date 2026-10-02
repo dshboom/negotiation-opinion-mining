@@ -1,0 +1,12 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>双3090实验进度</title>
+<style>body{font:15px/1.7 system-ui;background:#f3f6fb;color:#142033;max-width:1100px;margin:auto;padding:24px}section{background:white;padding:20px;border-radius:14px;margin:16px 0}table{width:100%;border-collapse:collapse}td,th{padding:10px;text-align:left;border-bottom:1px solid #ddd}pre{white-space:pre-wrap}.warn{color:#b45309}progress{width:160px}a{color:#2563eb}</style>
+<h1>双 3090 · 实验实时进度</h1><a href="./">返回项目主页</a><p>GPU 0 短跑训练；GPU 1 预测与评分。60篇筛选分不是正式全量成绩。</p>
+<p id="time">加载中</p><p id="stale" class="warn"></p><button onclick="load()">刷新</button>
+<section><h2>GPU 与队列</h2><pre id="gpu"></pre><p id="queue"></p></section>
+<section><h2>实验进度</h2><table><thead><tr><th>实验</th><th>阶段</th><th>状态</th><th>步数</th><th>时间信息</th></tr></thead><tbody id="jobs"></tbody></table></section>
+<section><h2>初筛成绩</h2><table><thead><tr><th>实验</th><th>综合</th><th>F1</th><th>抽取</th><th>未来</th></tr></thead><tbody id="scores"></tbody></table></section>
+<section><h2>告警</h2><pre id="alerts"></pre></section><p>页面每60秒刷新；数据约每3分钟同步，GitHub Pages发布另有延迟。超过10分钟未同步会提示过期。无实时AI介入保证。</p>
+<script>
+const $=id=>document.getElementById(id),esc=x=>String(x??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function load(){try{const r=await fetch('./data/dual3090.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(r.status);const d=await r.json();$('time').textContent='服务器检查：'+d.time+' ｜ 发布：'+d.published_at;$('stale').textContent=Date.now()-Date.parse(d.published_at)>600000?'⚠ 数据已超过10分钟未同步，请勿当作当前状态':'';$('gpu').textContent=d.gpu;$('queue').textContent='主队列存活：'+d.queue_alive+'；维护暂停：'+d.maintenance;$('jobs').innerHTML=Object.entries(d.jobs||{}).flatMap(([n,st])=>Object.entries(st).map(([s,v])=>`<tr><td>${esc(n)}</td><td>${esc(s)}</td><td>${esc(v.status)}</td><td>${v.progress?esc(v.progress.step)+'/'+esc(v.progress.total):'—'}</td><td>${esc(v.progress?.timing)}</td></tr>`)).join('');$('scores').innerHTML=Object.entries(d.scores||{}).map(([n,v])=>`<tr><td>${esc(n)}</td>${['composite','F1','extract_score','predict_score'].map(k=>'<td>'+esc(v[k])+'</td>').join('')}</tr>`).join('');$('alerts').textContent=(d.alerts||[]).join('\n')||'暂无告警';}catch(e){$('stale').textContent='⚠ 加载失败：'+e.message+'；不能据此认定任务正常';}}load();setInterval(load,60000);
+</script></html>
