@@ -3,6 +3,9 @@
 > 用 Qwen3 对**外交 / 时政长文本**做结构化观点挖掘：抽取多议题、判定立场、引用原文证据，并预测未来表态。
 >
 > 本仓库包含完整的**可复现流水线**、**1:1 复刻的官方评分器**、以及全部实验记录（含证伪项）。
+>
+> 🌐 **实时进度站点（GitHub Pages）：https://dshboom.github.io/negotiation-opinion-mining/**
+> 数据源：`docs/data/progress.json`，日更新一条命令：`python scripts/update_progress.py --phase "..." --status doing --progress 40`
 
 ---
 

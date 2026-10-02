@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>谈判观点挖掘 · 项目进度</title>
+<style>
+  :root{--bg:#f5f8fc;--card:#fff;--ink:#0f172a;--muted:#5b6b82;--line:#e2e9f3;
+        --blue:#2563eb;--green:#15a34a;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;
+        --gs:#e6f6ec;--rs:#fdeaea;--as:#fdf3e3;--bs:#e8efff;--ps:#f1eaff;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.75;
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 18px 70px}
+  header{background:linear-gradient(135deg,#0b1220,#122a52 55%,#1d4ed8 135%);color:#fff;
+         padding:34px 0 28px;margin-bottom:26px}
+  header .in{max-width:1100px;margin:0 auto;padding:0 18px;display:flex;flex-wrap:wrap;gap:22px;
+             align-items:flex-end;justify-content:space-between}
+  h1{margin:0;font-size:29px}
+  .sub{color:#cfe0ff;font-size:14px;margin-top:4px}
+  .big{text-align:right}
+  .big b{font-size:40px;line-height:1;display:block}
+  .big span{font-size:12.5px;color:#bcd3ff}
+  .updated{font-size:12.5px;color:#9fb6dd;margin-top:8px}
+  h2{font-size:21px;margin:30px 0 4px}
+  h2 .n{display:inline-block;background:var(--blue);color:#fff;border-radius:8px;font-size:13px;padding:1px 9px;margin-right:9px;vertical-align:2px}
+  .sub2{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  @media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}.in{flex-direction:column;align-items:flex-start}.big{text-align:left}}
+  .kpi b{display:block;font-size:23px;line-height:1.3}
+  .kpi span{font-size:12.5px;color:var(--muted)}
+  .ph{display:flex;flex-direction:column;gap:12px}
+  .phase{display:grid;grid-template-columns:1fr 130px;gap:10px 14px;align-items:center}
+  .phase .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .pill{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 10px}
+  .p-done{background:var(--gs);color:var(--green)} .p-doing{background:var(--as);color:var(--amber)}
+  .p-pending{background:#eef2f7;color:#64748b}
+  .bar{height:9px;background:#eef2f7;border-radius:6px;overflow:hidden;margin-top:6px}
+  .bar>i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#2563eb,#60a5fa)}
+  .phase .detail{font-size:13px;color:var(--muted)}
+  .phase .pct{font-size:13px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:left}
+  th{background:#f1f6fd;color:#33415c;font-size:12.6px;font-weight:700}
+  td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  tr.best td{background:#f0fdf4;font-weight:700}
+  .mark{font-size:11px;border-radius:6px;padding:1px 7px;background:var(--bs);color:var(--blue)}
+  .mark.probe{background:#eef2f7;color:#64748b}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
+  .filters button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;color:#42506a}
+  .filters button.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+  .exps{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:860px){.exps{grid-template-columns:1fr}}
+  .exp{border-left:5px solid var(--line);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+  .exp.ok{border-left-color:var(--green)} .exp.no{border-left-color:var(--red)}
+  .exp.run{border-left-color:var(--amber)} .exp.info{border-left-color:var(--blue)}
+  .exp h3{margin:0 0 4px;font-size:15.5px}
+  .exp .g{font-weight:800}
+  .g.pos{color:var(--green)} .g.neg{color:var(--red)} .g.flat{color:var(--muted)} .g.run{color:var(--amber)}
+  .exp .m{font-size:12.6px;color:var(--muted);margin-top:5px}
+  .exp .w{font-size:12.8px;color:#475569;margin-top:5px}
+  .grid2{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:860px){.grid2{grid-template-columns:1fr}}
+  .todos{display:flex;flex-direction:column;gap:8px}
+  .todo{display:flex;gap:10px;align-items:center;font-size:14px}
+  .links{display:flex;flex-wrap:wrap;gap:9px}
+  .links a{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:13.5px}
+  .links a:hover{border-color:var(--blue)}
+  .foot{color:var(--muted);font-size:12.5px;text-align:center;margin-top:36px;border-top:1px solid var(--line);padding-top:16px}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 13px;font-size:13px;cursor:pointer}
+  .banner{background:#fffbf0;border:1px solid #f2e2bc;color:#7a5b12;border-radius:11px;padding:11px 14px;font-size:13.5px;margin-bottom:14px}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div>
+    <h1 id="proj">谈判观点挖掘</h1>
+    <div class="sub" id="subtitle">加载中 …</div>
+  </div>
+  <div class="big">
+    <b id="best">—</b><span id="bestlabel"></span>
+    <div class="updated">最后更新：<span id="updated">—</span></div>
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div id="err" class="banner" style="display:none"></div>
+
+  <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">
+    <button class="btn" onclick="load(true)">🔄 立即刷新</button>
+    <button class="btn" id="autobtn" onclick="toggleAuto()">⏱ 自动刷新：开</button>
+  </div>
+
+  <h2><span class="n">1</span>关键指标</h2>
+  <div class="kpis" id="kpis"></div>
+
+  <h2><span class="n">2</span>当前进度</h2>
+  <p class="sub2">进度数据来自 <code>docs/data/progress.json</code>，更新该文件即可刷新本页。</p>
+  <div class="card ph" id="phases"></div>
+
+  <h2><span class="n">3</span>主结果（val 300）</h2>
+  <p class="sub2">综合分 = 0.8 × (F1 × α) + 0.2 × 预测得分</p>
+  <div class="card" style="padding:0;overflow-x:auto">
+    <table><thead><tr>
+      <th>配置</th><th>引擎</th><th class="n">F1</th><th class="n">α</th>
+      <th class="n">抽取(80%)</th><th class="n">未来(20%)</th><th class="n">综合</th><th>备注</th>
+    </tr></thead><tbody id="results"></tbody></table>
+  </div>
+
+  <h2><span class="n">4</span>实验看板</h2>
+  <p class="sub2">有效与证伪同等重要——证伪清单能避免重复踩坑。</p>
+  <div class="filters" id="filters">
+    <button class="on" data-f="all">全部</button>
+    <button data-f="ok">✅ 有效</button>
+    <button data-f="no">❌ 证伪</button>
+    <button data-f="run">🔄 进行中</button>
+    <button data-f="info">📐 方法论</button>
+  </div>
+  <div class="exps" id="exps"></div>
+
+  <h2><span class="n">5</span>关键发现</h2>
+  <div class="grid2" id="findings"></div>
+
+  <h2><span class="n">6</span>待办 / 下一步</h2>
+  <div class="card todos" id="todos"></div>
+
+  <h2><span class="n">7</span>相关链接</h2>
+  <div class="links" id="links"></div>
+
+  <div class="foot">
+    <span id="footproj">谈判观点挖掘</span> · GitHub Pages ｜ 页面渲染时间：<span id="rendered">—</span>
+  </div>
+</div>
+
+<script>
+const DATA_URL = './data/progress.json';
+const STATUS = { done:['已完成','p-done'], doing:['进行中','p-doing'], pending:['待开始','p-pending'] };
+const EXP = { ok:['✅ 有效','b-ok'], no:['❌ 证伪','b-no'], run:['🔄 进行中','b-run'], info:['📐 方法论','b-info'] };
+let DATA = null, auto = true, timer = null;
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function num(x){ return (typeof x === 'number') ? x.toFixed(4) : esc(x); }
+
+async function load(manual){
+  try{
+    const r = await fetch(DATA_URL + '?t=' + Date.now(), {cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    DATA = await r.json();
+    document.getElementById('err').style.display = 'none';
+    render();
+  }catch(e){
+    const el = document.getElementById('err');
+    el.style.display = 'block';
+    el.innerHTML = '⚠️ 数据加载失败（' + esc(e.message) + '）。若你用 file:// 直接打开，浏览器会拦截 fetch——请通过 GitHub Pages 访问，或本地起一个静态服务器。';
+  }
+}
+
+function render(){
+  const d = DATA;
+  document.getElementById('proj').textContent = d.project || '';
+  document.getElementById('subtitle').textContent = d.subtitle || '';
+  document.getElementById('best').textContent = d.best || '';
+  document.getElementById('bestlabel').textContent = d.best_label || '';
+  document.getElementById('updated').textContent = d.updated || '';
+  document.getElementById('footproj').textContent = d.project || '';
+  document.getElementById('rendered').textContent = new Date().toLocaleString('zh-CN');
+
+  document.getElementById('kpis').innerHTML = (d.kpis||[]).map(k =>
+    `<div class="card kpi"><b>${esc(k.value)}</b><span>${esc(k.label)}</span></div>`).join('');
+
+  document.getElementById('phases').innerHTML = (d.phases||[]).map(p => {
+    const st = STATUS[p.status] || ['—','p-pending'];
+    const pct = Math.max(0, Math.min(100, p.progress||0));
+    return `<div class="phase">
+      <div>
+        <div class="top"><b>${esc(p.name)}</b><span class="pill ${st[1]}">${st[0]}</span></div>
+        <div class="bar"><i style="width:${pct}%"></i></div>
+        <div class="detail">${esc(p.detail||'')}</div>
+      </div>
+      <div class="pct">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  const bestComp = Math.max(...(d.results||[]).map(r => r.composite));
+  document.getElementById('results').innerHTML = (d.results||[]).map(r => {
+    const cls = (r.composite === bestComp) ? ' class="best"' : '';
+    const mk = r.mark ? `<span class="mark ${/探针|参照/.test(r.name)?'probe':''}">${esc(r.mark)}</span>` : '';
+    return `<tr${cls}><td>${esc(r.name)}</td><td>${esc(r.engine)}</td>
+      <td class="n">${num(r.f1)}</td><td class="n">${num(r.alpha)}</td>
+      <td class="n">${num(r.extract)}</td><td class="n">${num(r.future)}</td>
+      <td class="n">${num(r.composite)}</td><td>${mk}</td></tr>`;
+  }).join('');
+
+  document.getElementById('exps').innerHTML = (d.experiments||[]).map(x => {
+    const st = EXP[x.status] || ['—','b-gray'];
+    const gcls = /^\+/.test(x.gain) ? 'pos' : (/^[−-]/.test(x.gain) ? 'neg' : (/待评/.test(x.gain) ? 'run' : 'flat'));
+    return `<div class="exp ${x.status}" data-k="${x.status}">
+      <h3>${esc(x.id)} · ${esc(x.name)} <span class="pill ${st[1]}">${st[0]}</span></h3>
+      <div class="g ${gcls}">收益：${esc(x.gain)}</div>
+      <div class="m">参数：${esc(x.params)}</div>
+      <div class="w">${esc(x.why)}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('findings').innerHTML = (d.findings||[]).map(f =>
+    `<div class="card"><b>${esc(f.title)}</b><div style="font-size:13.6px;color:#475569;margin-top:6px">${esc(f.text)}</div></div>`
+  ).join('');
+
+  document.getElementById('todos').innerHTML = (d.todos||[]).map(t => {
+    const st = STATUS[t.status] || ['—','p-pending'];
+    return `<div class="todo"><span class="pill ${st[1]}">${st[0]}</span><span>${esc(t.task)}</span></div>`;
+  }).join('');
+
+  document.getElementById('links').innerHTML = (d.links||[]).map(l =>
+    `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)} ↗</a>`).join('');
+
+  applyFilter(currentFilter);
+}
+
+let currentFilter = 'all';
+function applyFilter(f){
+  currentFilter = f;
+  document.querySelectorAll('#exps .exp').forEach(e => {
+    e.style.display = (f === 'all' || e.getAttribute('data-k') === f) ? '' : 'none';
+  });
+}
+document.querySelectorAll('#filters button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#filters button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); applyFilter(b.getAttribute('data-f'));
+}));
+
+function toggleAuto(){
+  auto = !auto;
+  document.getElementById('autobtn').textContent = '⏱ 自动刷新：' + (auto ? '开' : '关');
+  scheduleAuto();
+}
+function scheduleAuto(){
+  if(timer) clearInterval(timer);
+  if(auto) timer = setInterval(() => load(false), 5*60*1000);  // 5 分钟
+}
+
+load(false);
+scheduleAuto();
+</script>
+</body>
+</html>
