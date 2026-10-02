@@ -1,5 +1,5 @@
 {
-  "time": "2026-10-03T07:44:04+0800",
+  "time": "2026-10-03T07:47:04+0800",
   "jobs": {
     "S01_baseline": {
       "train": {
@@ -23,17 +23,17 @@
       "train": {
         "status": "running",
         "progress": {
-          "step": 3,
+          "step": 5,
           "total": 40,
-          "timing": "03:43<45:03, 73.08s/it"
+          "timing": "06:21<45:15, 77.57s/it"
         }
       }
     }
   },
   "scores": {},
   "alerts": [],
-  "gpu": "0, 21215 MiB, 100 %\n1, 11955 MiB, 16 %",
+  "gpu": "0, 21215 MiB, 100 %\n1, 11955 MiB, 19 %",
   "queue_alive": true,
   "maintenance": false,
-  "published_at": "2026-10-02T23:44:22.892456+00:00"
+  "published_at": "2026-10-02T23:47:25.804210+00:00"
 }
