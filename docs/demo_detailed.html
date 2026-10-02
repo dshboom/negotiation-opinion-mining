@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>谈判观点挖掘 · 项目成果详解</title>
+<style>
+  :root{
+    --bg:#f5f8fc; --card:#fff; --ink:#0f172a; --muted:#5b6b82; --line:#e2e9f3;
+    --blue:#2563eb; --blue-soft:#e8efff; --green:#15a34a; --green-soft:#e6f6ec;
+    --red:#dc2626; --red-soft:#fdeaea; --amber:#d97706; --amber-soft:#fdf3e3;
+    --purple:#7c3aed; --purple-soft:#f1eaff; --dark:#0b1220;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:15px;
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;
+       line-height:1.78;-webkit-font-smoothing:antialiased}
+  .layout{display:flex;align-items:flex-start;max-width:1500px;margin:0 auto}
+  aside{position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto;
+        width:246px;flex:0 0 246px;background:#0b1220;color:#c8d6ee;padding:22px 0 40px}
+  aside .brand{padding:0 20px 16px;border-bottom:1px solid #22314e;margin-bottom:12px}
+  aside .brand b{color:#fff;font-size:16px;display:block}
+  aside .brand span{font-size:12px;color:#7f93b5}
+  aside a{display:block;padding:7px 20px;color:#aebdd6;font-size:13.5px;border-left:3px solid transparent}
+  aside a:hover{background:#131f36;color:#fff;border-left-color:var(--blue)}
+  aside .grp{padding:12px 20px 5px;font-size:11.5px;letter-spacing:.6px;color:#5f7396;text-transform:uppercase}
+  main{flex:1;min-width:0;padding:0 34px 90px}
+  .hero{background:linear-gradient(135deg,#0b1220,#122a52 55%,#1d4ed8 135%);color:#fff;
+        margin:0 -34px 30px;padding:44px 34px 36px}
+  .hero h1{margin:0 0 8px;font-size:32px}
+  .hero p{margin:0;color:#cfe0ff;max-width:900px;font-size:15px}
+  .hero .kpis{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+  .kpi{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:13px;padding:12px 18px;min-width:132px}
+  .kpi b{display:block;font-size:23px;line-height:1.3}
+  .kpi span{font-size:12px;color:#bcd3ff}
+  section{margin:0 0 44px;scroll-margin-top:14px}
+  h2{font-size:23px;margin:0 0 4px;padding-top:8px}
+  h2 .num{display:inline-block;background:var(--blue);color:#fff;border-radius:8px;font-size:14px;padding:2px 10px;margin-right:10px;vertical-align:2px}
+  h3{font-size:17px;margin:22px 0 8px}
+  h4{font-size:15px;margin:16px 0 6px;color:#26334d}
+  .sub{color:var(--muted);margin:0 0 18px;font-size:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:1150px){aside{display:none}.layout{display:block}main{padding:0 18px 70px}.hero{margin:0 -18px 24px;padding:32px 18px}
+    .g2,.g3,.g4{grid-template-columns:1fr}}
+  .badge{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;vertical-align:2px}
+  .b-ok{background:var(--green-soft);color:var(--green)} .b-no{background:var(--red-soft);color:var(--red)}
+  .b-run{background:var(--amber-soft);color:var(--amber)} .b-info{background:var(--blue-soft);color:var(--blue)}
+  .b-gray{background:#eef2f7;color:#64748b} .b-pur{background:var(--purple-soft);color:var(--purple)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:6px 0}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{background:#f1f6fd;color:#33415c;font-weight:700;font-size:12.8px}
+  tr:hover td{background:#fafcff}
+  td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .tbl-wrap{overflow-x:auto}
+  .best td{background:#f0fdf4!important;font-weight:700}
+  code{background:#f1f5f9;padding:1px 6px;border-radius:5px;font-size:12.8px;
+       font-family:ui-monospace,Consolas,"Courier New",monospace}
+  pre{background:#0b1220;color:#d7e3ff;padding:14px 16px;border-radius:11px;overflow:auto;font-size:12.6px;line-height:1.62;margin:8px 0}
+  .exp{border-left:5px solid var(--line)}
+  .exp.ok{border-left-color:var(--green)} .exp.no{border-left-color:var(--red)}
+  .exp.run{border-left-color:var(--amber)} .exp.info{border-left-color:var(--blue)}
+  .exp h3{margin:0 0 2px;font-size:17px}
+  .exp .meta{color:var(--muted);font-size:13px;margin-bottom:10px}
+  .kv{display:grid;grid-template-columns:74px 1fr;gap:6px 12px;font-size:13.6px;margin-top:6px}
+  .kv .k{color:var(--muted);font-weight:700;font-size:12.6px;padding-top:1px}
+  .gain{font-weight:800} .gain.pos{color:var(--green)} .gain.neg{color:var(--red)} .gain.flat{color:var(--muted)}
+  .note{background:#fffbf0;border:1px solid #f2e2bc;border-radius:11px;padding:12px 15px;font-size:13.8px;color:#7a5b12}
+  .note.blue{background:#f3f7ff;border-color:#cfe0ff;color:#2c4a86}
+  .note.green{background:#f2fbf5;border-color:#c8ecd5;color:#17663a}
+  .note.red{background:#fef5f5;border-color:#f6cfcf;color:#8f2727}
+  .tag{display:inline-block;font-size:11.5px;border-radius:5px;padding:1px 7px;margin-right:5px}
+  .t-gold{background:var(--green-soft);color:var(--green);font-weight:700}
+  .t-pred{background:var(--amber-soft);color:var(--amber);font-weight:700}
+  .wf{display:flex;align-items:flex-end;gap:10px;height:230px;padding:10px 4px 0}
+  .wfi{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+  .wfseg{width:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}
+  .wflbl{font-size:11.5px;color:var(--muted);margin-top:7px;text-align:center}
+  .pill{display:inline-block;background:#eef2f7;border-radius:7px;padding:2px 9px;font-size:12.5px;margin:2px 4px 2px 0;color:#42506a}
+  .step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .step .no{font-size:11.5px;color:#fff;background:var(--blue);border-radius:6px;padding:1px 7px;display:inline-block;margin-bottom:6px}
+  .foot{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);margin-top:30px;padding-top:16px}
+  @media print{aside{display:none}.layout{display:block}.hero{margin:0;background:#0b1220}.card{break-inside:avoid}pre{font-size:10.5px}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside>
+  <div class="brand"><b>谈判观点挖掘</b><span>项目成果详解 · 2026-10-02</span></div>
+  <div class="grp">总览</div>
+  <a href="#s1">1 · 项目总览与环境</a>
+  <a href="#s2">2 · 赛题任务详解</a>
+  <a href="#s3">3 · 评分规则与本地评分器</a>
+  <div class="grp">方法</div>
+  <a href="#s4">4 · 数据构造</a>
+  <a href="#s5">5 · SFT 训练方法</a>
+  <a href="#s6">6 · vLLM 推理加速</a>
+  <div class="grp">实验</div>
+  <a href="#s7">7 · 实验档案（12 项）</a>
+  <a href="#s8">8 · 主结果与分布</a>
+  <a href="#s9">9 · 失败归因诊断</a>
+  <a href="#s10">10 · 真实案例</a>
+  <div class="grp">结论</div>
+  <a href="#s11">11 · 关键发现</a>
+  <a href="#s12">12 · 下一步</a>
+  <a href="#s13">13 · 附录（脚本/术语/FAQ）</a>
+</aside>
+
+<main>
+<div class="hero">
+  <h1>谈判观点挖掘 · 项目成果详解</h1>
+  <p>给定外交/时政长文，抽取「议题观点」并预测「未来表态」。本页完整记录方法、参数、原理、训练过程、全部实验结果（含证伪项）与真实案例。</p>
+  <div class="kpis">
+    <div class="kpi"><b>0.6082</b><span>★ 32B 当前最佳（val 300）</span></div>
+    <div class="kpi"><b>0.5678</b><span>14B 最佳（本机）</span></div>
+    <div class="kpi"><b>+0.217</b><span>14B 相对基座提升</span></div>
+    <div class="kpi"><b>8.7×</b><span>vLLM 生成加速</span></div>
+    <div class="kpi"><b>12</b><span>实验：4 有效 / 7 证伪 / 1 进行中</span></div>
+    <div class="kpi"><b>3</b><span>核心发现</span></div>
+  </div>
+</div>
+
+<!-- ================= 1 ================= -->
+<section id="s1">
+<h2><span class="num">1</span>项目总览与环境</h2>
+<p class="sub">目标：先把「方法」在 14B 上验证透，再平移到官方指定的 32B 基座，避免在大模型上重复试错。</p>
+
+<h3>1.1 项目要解决什么</h3>
+<div class="grid g3">
+  <div class="card"><b>① 观点抽取（占 80%）</b><p style="margin:6px 0 0;font-size:13.6px;color:#475569">识别一篇文档里的多个议题，为每个议题给出：议题名、立场、以及支持该立场的原文证据。</p></div>
+  <div class="card"><b>② 未来表态预测（占 20%）</b><p style="margin:6px 0 0;font-size:13.6px;color:#475569">为每个议题预测"接下来可能的表态"，80~120 字，考察趋势判断与生成能力。</p></div>
+  <div class="card"><b>③ 合规约束</b><p style="margin:6px 0 0;font-size:13.6px;color:#475569">官方指定基座为 <b>Qwen3-32B</b>。本机先用 Qwen3-14B 完成方法验证与消融，正式提交再上 32B。</p></div>
+</div>
+
+<h3>1.2 硬件与软件环境</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>项目</th><th>配置</th><th>说明 / 影响</th></tr></thead>
+  <tbody>
+    <tr><td>GPU</td><td>1 × NVIDIA L20（46,068 MiB，可用 ~44.4 GiB）</td><td>bf16 实测约 115 TFLOPS；HAMi GPU 虚拟化</td></tr>
+    <tr><td>CPU / 内存</td><td>2 vCPU / 24 GiB（无 swap）</td><td>数据预处理是瓶颈，故把推理切到 vLLM</td></tr>
+    <tr><td>训练环境</td><td>conda <code>YHLin</code>：torch 2.9.1+cu126、transformers 5.18.0、peft 0.21、accelerate 1.15、bitsandbytes 0.50.2</td><td>无 nvcc → 不能源码编译 flash-attn</td></tr>
+    <tr><td>推理环境</td><td>独立 venv <code>.venv-accel</code>：vLLM（含 torch）</td><td>不污染训练环境；<code>VLLM_USE_FLASHINFER_SAMPLER=0</code></td></tr>
+    <tr><td>网络</td><td>HuggingFace 不可达；改用 <b>ModelScope（模搭）</b> + <b>清华 PyPI 镜像</b></td><td>运行期零外网依赖（模型全本地）</td></tr>
+    <tr><td>模型</td><td>Qwen3-14B（27.5 GiB）、bge-small-zh-v1.5、bert-base-chinese</td><td>评分器用后两者</td></tr>
+  </tbody>
+</table></div>
+
+<h3>1.3 今天（10-02）的时间线</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th class="n">时间</th><th>事件</th><th>结果</th></tr></thead>
+  <tbody>
+    <tr><td class="n">上午</td><td>SFT 训练 r16 / r32 + 主流水线 + vLLM 迁移</td><td>0.5498 / 0.5527；vLLM 无损加速 8.7×</td></tr>
+    <tr><td class="n">午后</td><td>修复 <code>rescore.py</code> 字符偏移 bug</td><td>立场概率对齐率 27.8% → <b>96.0%</b></td></tr>
+    <tr><td class="n">17:40</td><td>⑥⑦⑧ 后处理完成</td><td>⑥ 立场校准 <b>+0.0151</b>；⑦⑧ 证伪</td></tr>
+    <tr><td class="n">18:12–19:26</td><td>Phase 0 诊断 + Phase 1（指令探针 / 5×采样 / SC-merge）</td><td>全部证伪；找到根因"系统性口径偏差"</td></tr>
+    <tr><td class="n">19:29–19:41</td><td>Phase 2 字段加权重训首次尝试</td><td>12 分钟后崩溃（后判定为显存溢出）</td></tr>
+    <tr><td class="n">19:52</td><td>训练容器被平台替换（数据盘未随迁）</td><td>转移至新 L20，进入重建</td></tr>
+    <tr><td class="n">20:34</td><td>重建 Stage 1（数据/环境/模型下载）</td><td>进行中</td></tr>
+  </tbody>
+</table></div>
+<div class="note blue"><b>方法论沉淀</b>：今天最大的产出不是某个分数，而是把"分数不够高"拆解成了三个可操作的技术问题（见第 9、11 节），并建立起「val 验收制 + 断点续跑」的工程规范。</div>
+</section>
+
+<!-- ================= 2 ================= -->
+<section id="s2">
+<h2><span class="num">2</span>赛题任务详解</h2>
+<p class="sub">理解输入输出的精确格式，是所有后续处理的基础。</p>
+
+<h3>2.1 输入：一篇文档</h3>
+<pre>{ "sample_id": "SAMPLE_0001",
+  "docs": [ { "doc_id": "DOC_0001",
+              "doc_type": "国际新闻报道",       // 记者会 / 联合声明 / 评论文章 / 政策文件 …
+              "publish_date": "2025-07-26",
+              "full_text": "2025年7月26日，全国党史学习教育经验交流会……" } ] }</pre>
+
+<h3>2.2 输出：结构化三段式</h3>
+<pre>{ "issue_list": [
+    { "issue_name": "反对脱钩断链",                     // 议题名（简短主题词）
+      "stance": "support",                             // 立场：support / oppose / neutral
+      "argument_chain": [ "原文原句 1", "原文原句 2" ] } // 证据链（必须逐字来自原文）
+  ],                                                   // 一篇文章通常 4~5 张卡
+  "future_argument": [ "与第 1 张卡一一对应的未来表态预测，80~120 字", "…" ] }</pre>
+
+<h3>2.3 字段字典</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>字段</th><th>含义</th><th>约束 / 常见取值</th></tr></thead>
+  <tbody>
+    <tr><td><code>issue_name</code></td><td>议题名</td><td>简短主题词；金标偏"概括性"，如「反对脱钩断链」</td></tr>
+    <tr><td><code>stance</code></td><td>立场</td><td>仅三值；<code>oppose</code> 在词表里是 2 个 token</td></tr>
+    <tr><td><code>argument_chain</code></td><td>证据链（列表）</td><td>必须逐字来自原文；金标 1~3 条，中位 2~3 条</td></tr>
+    <tr><td><code>future_argument</code></td><td>未来表态预测（列表）</td><td>与 <code>issue_list</code> 一一对应；金标逐字率 0%（纯生成）</td></tr>
+  </tbody>
+</table></div>
+
+<h3>2.4 数据划分与用途（关键纪律）</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>集合</th><th class="n">条数</th><th>标签</th><th>用途</th></tr></thead>
+  <tbody>
+    <tr><td>train</td><td class="n">2400</td><td>有</td><td><b>仅用于训练</b></td></tr>
+    <tr class="best"><td>val</td><td class="n">300</td><td>有</td><td><b>所有评分与验收都在这上面</b>；未参与训练</td></tr>
+    <tr><td>test</td><td class="n">300</td><td><b>无</b></td><td>仅用于产出提交预测，<b>不打分</b></td></tr>
+  </tbody>
+</table></div>
+<div class="note"><b>验收纪律</b>：任何改动（后处理 / 重训）都先在 val 上验证，只有提升才允许应用到 test —— 避免在无标签的 test 上"盲试"。此外，校准集（400 条）取自 train，属模型已见数据，仅用于诊断、用于验收时会明确标注偏乐观。</div>
+</section>
+
+<!-- ================= 3 ================= -->
+<section id="s3">
+<h2><span class="num">3</span>评分规则与本地评分器</h2>
+<p class="sub">test 无标签，因此我们 1:1 复刻了官方评分逻辑，作为唯一的"秤"。秤不准，后面所有结论都不成立。</p>
+
+<h3>3.1 观点抽取（占 80%）的完整算法</h3>
+<div class="grid g2">
+  <div class="card">
+    <b>匹配流程（伪代码）</b>
+<pre>for 每篇文档:
+  sim[i][j] = 0.4·cos(议题名_i, 议题名_j)
+            + 0.6·cos(证据链_i, 证据链_j)
+  ok[i][j]  = (立场_i == 立场_j)          # 硬门槛
+  mat = sim; mat[~ok] = -∞
+  (行,列) = 匈牙利算法(-mat)               # 一对一最大权匹配
+  NC = 匹配对中 sim &gt; 0.7 的对数
+
+P = NC / Np      R = NC / Ng
+F1 = 2PR/(P+R)   α = 匹配对的 BERTScore 均值
+抽取得分 = F1 × α</pre>
+  </div>
+  <div class="card">
+    <b>四个设计细节与含义</b>
+    <div class="kv">
+      <div class="k">硬门槛</div><div class="v">立场错 → 整张卡<b>直接作废</b>（这就是 ⑥ 立场校准的价值来源）</div>
+      <div class="k">权重 0.4/0.6</div><div class="v">证据链的影响比议题名更大</div>
+      <div class="k">阈值 0.7</div><div class="v">"像不像"的及格线；我们测得 145 张卡只差 0.05~0.10</div>
+      <div class="k">α 系数</div><div class="v">惩罚"证据不精准"；证据越像原文，α 越接近 1</div>
+    </div>
+    <p style="font-size:13.4px;color:#64748b;margin:10px 0 0">嵌入模型：<code>bge-small-zh-v1.5</code>；BERTScore：<code>bert-base-chinese</code>（第 9 层）。</p>
+  </div>
+</div>
+
+<h3>3.2 未来观点预测（占 20%）</h3>
+<p style="font-size:14px">把预测的 future_argument 与金标逐条比：<code>预测得分 = (ROUGE-L + BERTScore) / 2</code>，分母为 <code>max(Ng, Np)</code>。</p>
+
+<h3>3.3 综合分</h3>
+<div class="note green" style="font-size:15px"><b>综合分 = 0.8 × (F1 × α) + 0.2 × 预测得分</b></div>
+
+<h3>3.4 评分器自检：两个探针</h3>
+<div class="grid g2">
+  <div class="card"><span class="badge b-ok">探针 A</span><b style="margin-left:8px">把标准答案原样提交</b>
+    <p style="font-size:13.6px;margin:8px 0 0">预期满分，实际 <b>1.0000</b> → 证明匹配与打分链路无逻辑错误。</p></div>
+  <div class="card"><span class="badge b-info">探针 B</span><b style="margin-left:8px">金标议题名/立场 + 整篇原文当证据</b>
+    <p style="font-size:13.6px;margin:8px 0 0">得 <b>0.7309</b>（F1 0.980，但 α 仅 0.677）→ 揭示：<b>"证据"这一项几乎白送</b>，同时 α 会惩罚"不精准的证据"。</p></div>
+</div>
+<div class="note blue" style="margin-top:14px">探针 B 的启示：既然整篇原文都能过 0.7 阈值，说明"证据相似度"这一关很宽松；真要做强，应把"证据必须是原文逐字子串"变成硬约束。这一判断后来被诊断（第 9 节）修正——模型其实已经 99.2% 逐字了。</div>
+</section>
+
+<!-- ================= 4 ================= -->
+<section id="s4">
+<h2><span class="num">4</span>数据构造</h2>
+<p class="sub">把竞赛数据转成 Qwen3 的对话格式（system / user / assistant），训练与推理共用同一模板。</p>
+
+<h3>4.1 System 提示词（全文）</h3>
+<pre>你是外交/时政长文本的观点挖掘专家。给定一篇文档，你需要：
+1) 抽取议题列表（第 1 个为主议题，其后为子议题），每个议题给出：
+   议题名 issue_name、立场 stance（只能是 support/oppose/neutral 之一）、
+   以及来自原文的逐字证据链 argument_chain（必须是原文的子串）；
+2) 对每个议题预测未来可能出现的观点 future_argument
+   （与 issue_list 顺序、数量一致，80~120 字）。
+严格只输出一个 JSON 对象，不要任何多余文字。</pre>
+
+<h3>4.2 User 模板</h3>
+<pre>文档类型：{doc_type}
+发布日期：{publish_date}
+
+【文档正文】
+{full_text}
+
+请抽取议题观点并预测未来表态，按 JSON 输出。</pre>
+
+<h3>4.3 Assistant 目标与数据规模</h3>
+<div class="grid g3">
+  <div class="card"><b>train → sft_train</b><p style="font-size:13.6px;margin:6px 0 0">2400 条，带 assistant 目标</p></div>
+  <div class="card"><b>val → sft_val</b><p style="font-size:13.6px;margin:6px 0 0">300 条，带 assistant 目标（评测用答案单独取 val.jsonl）</p></div>
+  <div class="card"><b>test → sft_test</b><p style="font-size:13.6px;margin:6px 0 0">300 条，<b>不带</b> assistant（模型生成）</p></div>
+</div>
+
+<h3>4.4 校准集构造</h3>
+<p style="font-size:14px">取 train 的前 400 条：<code>head -400 sft_train.jsonl → sft_calib.jsonl</code>；对应金标 <code>calib_gold.jsonl</code>。用于 ⑥b 的偏置搜索（该集在训练中已见，属"偏乐观"口径，仅作对照）。</p>
+</section>
+
+<!-- ================= 5 ================= -->
+<section id="s5">
+<h2><span class="num">5</span>SFT 训练方法</h2>
+<p class="sub">LoRA 微调 + 只对答案计算 loss + 官方空 think 块忽略策略。</p>
+
+<h3>5.1 三个核心设计</h3>
+<div class="grid g3">
+  <div class="card"><span class="badge b-info">设计 1</span><b style="margin-left:6px">LoRA</b>
+    <p style="font-size:13.5px;margin:8px 0 0">冻结原模型，只训练注入的<b>低秩增量矩阵</b>，覆盖全部线性层（q,k,v,o,gate,up,down）。显存与时间成本大幅降低，且可多份适配器并存对比。</p></div>
+  <div class="card"><span class="badge b-info">设计 2</span><b style="margin-left:6px">completions-only</b>
+    <p style="font-size:13.5px;margin:8px 0 0">prompt 部分 label 全部设为 −100（不参与 loss），只在"答案"上学习。让模型专注学"怎么答"，而不是复述题面。</p></div>
+  <div class="card"><span class="badge b-info">设计 3</span><b style="margin-left:6px">忽略空 think 块</b>
+    <p style="font-size:13.5px;margin:8px 0 0">Qwen3 关闭思考模式时，assistant 轮仍带空的 think 前缀。复刻官方 <code>loss_scale=ignore_empty_think</code>，把这段一起 mask 掉，只对 JSON 算 loss。</p></div>
+</div>
+
+<h3>5.2 超参数矩阵（训练）</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>超参数</th><th>r16 运行</th><th>r32 运行</th><th>r32-v2 加权重训</th><th>含义</th></tr></thead>
+  <tbody>
+    <tr><td>LoRA rank r</td><td class="n">16</td><td class="n">32</td><td class="n">32</td><td>低秩维度，越大容量越强</td></tr>
+    <tr><td>LoRA alpha</td><td class="n">32</td><td class="n">64</td><td class="n">64</td><td>取 2r（官方示例惯例）</td></tr>
+    <tr><td>LoRA dropout</td><td class="n">0.05</td><td class="n">0.05</td><td class="n">0.05</td><td>正则</td></tr>
+    <tr><td>target modules</td><td colspan="3">all-linear（7 类投影层）</td><td>覆盖范围</td></tr>
+    <tr><td>学习率</td><td colspan="3">1e-4，cosine，warmup 5%，weight_decay 0.01，max_grad_norm 1.0</td><td>优化器设置</td></tr>
+    <tr><td>batch</td><td colspan="3">bs=1 × grad_accum=16（有效 16）</td><td>显存受限所以用梯度累积</td></tr>
+    <tr><td>max_len</td><td colspan="3">6144</td><td>长文档截断长度</td></tr>
+    <tr><td>精度</td><td colspan="3">bf16 + tf32 + 梯度检查点</td><td>省显存</td></tr>
+    <tr><td>epochs</td><td class="n">2</td><td class="n">2</td><td class="n"><b>3</b></td><td>训练轮数</td></tr>
+    <tr><td>保存步数</td><td colspan="2">每 50 步</td><td>—</td><td>可断点续训</td></tr>
+    <tr><td>最终 train loss</td><td class="n">0.515</td><td class="n">0.504</td><td>进行中</td><td>训练收敛情况</td></tr>
+  </tbody>
+</table></div>
+
+<h3>5.3 训练过程细节</h3>
+<div class="grid g2">
+  <div class="card"><b>tokenization 与 mask</b>
+<pre>p_ids = chat_template(msgs[:-1], add_generation_prompt=True)
+f_ids = chat_template(msgs,      add_generation_prompt=False)
+assert f_ids[:len(p_ids)] == p_ids      # 前缀一致
+labels = [-100]*len(p_ids) + f_ids[len(p_ids):]   # prompt 全 mask</pre>
+  </div>
+  <div class="card"><b>耗时与资源</b>
+    <div class="kv">
+      <div class="k">r16</div><div class="v">约 2 小时（2 epochs）</div>
+      <div class="k">r32</div><div class="v">约 2 小时（2 epochs）</div>
+      <div class="k">显存</div><div class="v">14B bf16 ≈ 28 GB + 激活，L20 44GB 内可训</div>
+      <div class="k">首包耗时</div><div class="v">加载模型 ~2-3 分钟</div>
+    </div>
+  </div>
+</div>
+<div class="note"><b>transformers v5 迁移坑</b>：<code>overwrite_output_dir</code> 已删除；<code>warmup_ratio</code> → <code>warmup_steps</code>（可直接传比例）；<code>evaluation_strategy</code> → <code>eval_strategy</code>；Trainer 的 <code>tokenizer</code> → <code>processing_class</code>。另外 HAMi 不支持 <code>expandable_segments</code>（会报 CUDA invalid argument），必须关闭。</div>
+</section>
+
+<!-- ================= 6 ================= -->
+<section id="s6">
+<h2><span class="num">6</span>vLLM 推理加速</h2>
+<p class="sub">把"逐条 HF 生成"换成"vLLM 离线批量"，是后续一切高成本实验（5×采样等）能跑起来的前提。</p>
+
+<h3>6.1 为什么能快</h3>
+<div class="grid g3">
+  <div class="card"><b>PagedAttention</b><p style="font-size:13.5px;margin:6px 0 0">KV Cache 分页管理，显存碎片大幅减少，可同时驻留更多序列。</p></div>
+  <div class="card"><b>连续批处理</b><p style="font-size:13.5px;margin:6px 0 0">不同长度的请求动态拼批，GPU 不再空转等最长序列。</p></div>
+  <div class="card"><b>工程隔离</b><p style="font-size:13.5px;margin:6px 0 0">独立 venv，训练环境不受污染；输出格式与 HF 完全一致。</p></div>
+</div>
+
+<h3>6.2 参数与实测</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>项目</th><th>值</th></tr></thead>
+  <tbody>
+    <tr><td>dtype / max_model_len / gpu_util</td><td>bf16 / 8192 / 0.95</td></tr>
+    <tr><td>LoRA</td><td>启用（max_lora_rank=32）</td></tr>
+    <tr><td>关键环境变量</td><td><code>VLLM_USE_FLASHINFER_SAMPLER=0</code>（本机无 nvcc）</td></tr>
+    <tr><td>val 生成耗时</td><td>84 min（HF） → <b>9.6 min</b>（vLLM）</td></tr>
+    <tr><td>加速比</td><td><b>8.7×</b>（含引擎启动则约 7.1×）</td></tr>
+    <tr><td>分数</td><td>0.5527（HF） → <b>0.5538</b>（vLLM）—— <b>任务级无损</b>（生成非逐位一致，约 9 条样本卡片数翻转）</td></tr>
+  </tbody>
+</table></div>
+
+<h3>6.3 踩过的坑与运维</h3>
+<div class="grid g2">
+  <div class="card"><b>坑 1 · FlashInfer 需要 nvcc</b><p style="font-size:13.6px;margin:6px 0 0">默认 sampler 会尝试 JIT 编译；本机无 nvcc → 必须 <code>VLLM_USE_FLASHINFER_SAMPLER=0</code>，必要时加 <code>enforce_eager=True</code>。</p></div>
+  <div class="card"><b>坑 2 · EngineCore 残留占显存</b><p style="font-size:13.6px;margin:6px 0 0">父进程被杀后 <code>VLLM::EngineCore</code> 子进程不退出，占约 44GB。需按 cmdline 显式清理（不能简单 <code>pkill -f</code>，会误杀发起清理的脚本自身）。</p></div>
+</div>
+</section>
+
+<!-- ================= 7 ================= -->
+<section id="s7">
+<h2><span class="num">7</span>实验档案（12 项）</h2>
+<p class="sub">每项包含：参数 / 方法 / 原理 / 过程 / 收益。<b>4 有效、7 证伪、1 进行中</b>。证伪同样计入成果。</p>
+
+<div class="card exp ok">
+  <h3>E1 · SFT 微调 r16 <span class="badge b-ok">有效</span></h3>
+  <div class="meta">综合 0.3511 → <b>0.5498</b>（+0.1987）｜ 约 2 小时 ｜ 最终 loss 0.515</div>
+  <div class="kv">
+    <div class="k">参数</div><div class="v">r=16, alpha=32, all-linear, dropout=0.05, lr=1e-4, bs=1×ga16, max_len=6144, bf16, warmup 5%, 2 epochs</div>
+    <div class="k">方法</div><div class="v">Qwen3-14B + LoRA，completions-only，空 think 块 mask</div>
+    <div class="k">原理</div><div class="v">注入低秩增量即可学会"这个任务怎么答"；只学答案避免浪费容量在题面上</div>
+    <div class="k">收益</div><div class="v gain pos">+0.1987（+57%），全部实验里最大单项提升</div>
+    <div class="k">命令</div><div class="v"><code>train_lora.py --epochs 2 --lora-r 16 --lora-alpha 32 --lr 1e-4 --grad-accum 16</code></div>
+  </div>
+</div>
+
+<div class="card exp ok" style="margin-top:14px">
+  <h3>E2 · SFT 微调 r32 <span class="badge b-ok">有效（微增）</span></h3>
+  <div class="meta">0.5498 → <b>0.5527</b>（+0.0029）｜ 最终 loss 0.504</div>
+  <div class="kv">
+    <div class="k">参数</div><div class="v">r=32, alpha=64，其余与 E1 完全相同</div>
+    <div class="k">方法</div><div class="v">仅增大 LoRA 容量，验证"容量是不是瓶颈"</div>
+    <div class="k">原理</div><div class="v">r 越大可表达增量越多；但本任务瓶颈在"口径/数据"，不在容量</div>
+    <div class="k">收益</div><div class="v gain pos">+0.0029 —— <b>说明继续加大 rank 已饱和（后续不再尝试 r64）</b></div>
+  </div>
+</div>
+
+<div class="card exp ok" style="margin-top:14px">
+  <h3>E3 · vLLM 推理加速 <span class="badge b-ok">有效（工程）</span></h3>
+  <div class="meta">生成 <b>8.7×</b> ｜ 84 min → 9.6 min ｜ 0.5527 → 0.5538</div>
+  <div class="kv">
+    <div class="k">参数</div><div class="v">bf16 / max_model_len 8192 / gpu_util 0.95 / LoRA 启用 / <code>VLLM_USE_FLASHINFER_SAMPLER=0</code></div>
+    <div class="k">原理</div><div class="v">PagedAttention + 连续批处理</div>
+    <div class="k">收益</div><div class="v gain pos">任务级无损加速；使"5×采样"等实验从不可行变为 25 分钟</div>
+    <div class="k">命令</div><div class="v"><code>.venv-accel/bin/python infer_vllm.py --data sft_val.jsonl --adapter outputs/qwen3-14b-lora-r32</code></div>
+  </div>
+</div>
+
+<div class="card exp ok" style="margin-top:14px">
+  <h3>E4 · ⑥ 立场 logit 校准 <span class="badge b-ok">有效 ★ 当前最佳</span></h3>
+  <div class="meta">0.5527 → <b>0.5678</b>（+0.0151）｜ NC 1017 → 1043 ｜ F1 0.7182 → 0.7366</div>
+  <div class="kv">
+    <div class="k">参数</div><div class="v">b_neutral = <b>+0.7</b>，b_oppose = <b>−0.5</b>（先验分布 L1 = 0.0035）</div>
+    <div class="k">方法</div><div class="v">对每张卡前向取三分类概率 → 网格搜索偏置 → 使预测立场分布最接近<b>训练集先验分布</b></div>
+    <div class="k">原理</div><div class="v">立场是匹配的<b>硬门槛</b>。模型天然"中立"偏多（gold: support 862 / neutral 517 / oppose 42），往真实分布上掰，能救回一批"因立场错而整卡作废"的卡</div>
+    <div class="k">变体</div><div class="v">全局先验 0.5678 ＞ 按文档类型 0.5661 ＞ calib-F1 0.5638（后两者更弱；calib 集在训练中已见，偏乐观）</div>
+    <div class="k">合规</div><div class="v gain pos">无需标签、无泄漏；val 仅用于验收</div>
+  </div>
+</div>
+
+<div class="card exp no" style="margin-top:14px">
+  <h3>E5 · ⑦ 卡片数 k 扫描截断 <span class="badge b-no">证伪</span></h3>
+  <div class="meta">k = 3 / 4 / 5 / 6 / 7 ｜ 收益 ≤ 0</div>
+  <div class="kv">
+    <div class="k">方法</div><div class="v">用生成 log 概率给卡片排序，截断到前 k 张</div>
+    <div class="k">结果</div><div class="v">k=3 → 0.4387；k=4 → 0.5104；k≥5 → 0.5527（=基线）</div>
+    <div class="k">原理</div><div class="v">模型本就输出 4~5 张卡（Np 1402~1411 ≈ Ng 1421），<b>没有超过 5 张可截断的空间</b></div>
+    <div class="k">结论</div><div class="v gain flat">无操作空间，关闭该方向</div>
+  </div>
+</div>
+
+<div class="card exp no" style="margin-top:14px">
+  <h3>E6 · ⑧ 近重复卡片去重 <span class="badge b-no">证伪</span></h3>
+  <div class="meta">阈值 0.85 / 0.90 / 0.93 / 0.96 ｜ 收益 ≤ 0</div>
+  <div class="kv">
+    <div class="k">方法</div><div class="v">议题名 BGE 余弦 &gt; 阈值判为重复，保留 logp 更高者</div>
+    <div class="k">结果</div><div class="v">0.5489 / 0.5503 / 0.5503 / 0.5523，全部低于基线</div>
+    <div class="k">原理</div><div class="v">模型输出几乎没有近重复卡；去重反而误删有效卡</div>
+    <div class="k">结论</div><div class="v gain flat">负收益，关闭该方向</div>
+  </div>
+</div>
+
+<div class="card exp no" style="margin-top:14px">
+  <h3>E7 · Liger 融合核 <span class="badge b-no">证伪</span></h3>
+  <div class="kv">
+    <div class="k">方法</div><div class="v">启用 Liger-Kernel 融合算子以减少显存读写</div>
+    <div class="k">结果</div><div class="v">单步 50.04s → 49.33s（&lt;2%）</div>
+    <div class="k">原理</div><div class="v">本机瓶颈在 2 vCPU 与虚拟化 GPU，不在算子层</div>
+    <div class="k">结论</div><div class="v gain flat">≈0，不启用</div>
+  </div>
+</div>
+
+<div class="card exp no" style="margin-top:14px">
+  <h3>E8 · 指令探针 B1 / B2 <span class="badge b-no">证伪</span></h3>
+  <div class="meta">B1 0.5498 ｜ B2 0.5495 ｜ 均低于基线 0.5527</div>
+  <div class="kv">
+    <div class="k">方法</div><div class="v">在原 prompt 末尾追加："用简明概括的主题词命名议题"（B1）；"一个议题一张卡"（B2）</div>
+    <div class="k">原理</div><div class="v">SFT 模型按<b>固定 prompt</b> 训练；临场加话属分布外扰动，格式与口径都会漂移</div>
+    <div class="k">收益</div><div class="v gain neg">约 −0.018 —— 此路不通</div>
+  </div>
+</div>
+
+<div class="card exp no" style="margin-top:14px">
+  <h3>E9 · SC-merge 自一致性合并 <span class="badge b-no">证伪（全场最有价值的负结果）</span></h3>
+  <div class="meta">n=5 采样 + 共识投票 ｜ 0.4796 ~ 0.5246 ｜ single-best 0.5527</div>
+  <div class="kv">
+    <div class="k">方法</div><div class="v">T=0.7 每题独立采样 5 次 → 议题名 BGE 聚类（thr 0.65/0.80）→ 频次 ≥ F（2/3）保留 → 众数代表卡（名/立场/证据/未来）→ rescore + ⑥</div>
+    <div class="k">结果</div><div class="v">F2/t0.80 = 0.5246（NC 966）；F3/t0.80 = 0.4997（NC 838）；F2/t0.65 = 0.4796（NC 811）；挑最优单样本 = 0.5527</div>
+    <div class="k">原理</div><div class="v"><b>模型的口径偏差是系统性的，不是采样噪声</b>——5 次都朝同一方向偏，投票消不掉；且频次过滤会误伤"只被 1~2 次看到"的微妙真议题</div>
+    <div class="k">成本</div><div class="v">300 篇 × 5 采样 ≈ 25 分钟（vLLM 的红利）</div>
+    <div class="k">结论</div><div class="v gain neg">负收益，但直接推出"必须重训"的结论</div>
+  </div>
+</div>
+
+<div class="card exp info" style="margin-top:14px">
+  <h3>E10 · 失败归因诊断（Phase 0） <span class="badge b-info">方法论</span></h3>
+  <div class="meta">把"分数不够高"拆成可操作的技术问题</div>
+  <div class="kv">
+    <div class="k">方法</div><div class="v">复刻评分器匹配逻辑，对 378 张未匹配金标卡逐张归因；统计证据逐字率、议题名与原文重合度、近失分布</div>
+    <div class="k">结果</div><div class="v">配对但相似度≤0.7：<b>194</b>｜立场无同调卡：<b>101</b>｜相似度不足：64｜配对挤占：19；近失卡 <b>145 张只差 0.05~0.10</b></div>
+    <div class="k">结果</div><div class="v">近失对 cos(议题名)=<b>0.52</b> vs cos(证据)=<b>0.70</b>；证据逐字率 金标 100% / 模型 99.2%</div>
+    <div class="k">收益</div><div class="v gain pos">决定了后续所有实验的方向（详见第 9 节）</div>
+  </div>
+</div>
+
+<div class="card exp run" style="margin-top:14px">
+  <h3>E11 · 字段加权重训（Phase 2） <span class="badge b-run">进行中</span></h3>
+  <div class="meta">针对诊断出的短板字段提高 loss 权重</div>
+  <div class="kv">
+    <div class="k">方法</div><div class="v">自定义加权交叉熵：议题名 <b>×2</b>、立场 <b>×3</b>、未来论点 <b>×2</b>，其余 ×1</div>
+    <div class="k">参数</div><div class="v">r=32, alpha=64, <b>3 epochs</b>；同时跑"不加权 3 轮"对照，干净归因</div>
+    <div class="k">原理</div><div class="v">既然短板集中在"命名口径 / 立场 / 未来论点"，就放大这几处 loss 权重，逼模型学标准答案的表达习惯</div>
+    <div class="k">工程</div><div class="v">用 offset 映射把字段值定位到 token；loss 按 <b>1024 token 分块</b>计算，避免整段 logits 转 fp32 导致显存溢出（首版即因此崩溃）</div>
+    <div class="k">自检</div><div class="v">加权 token 精确落在议题名/立场上（如 <code>中日青年友好交流</code> / <code>neutral</code>），fallback 0</div>
+  </div>
+</div>
+
+<div class="card exp info" style="margin-top:14px">
+  <h3>E12 · 训练/推理模式对齐 <span class="badge b-info">基础</span></h3>
+  <div class="kv">
+    <div class="k">方法</div><div class="v">统一 <code>enable_thinking=False</code>；空 think 块不参与 loss</div>
+    <div class="k">原理</div><div class="v">对齐官方 <code>loss_scale=ignore_empty_think</code>，避免算力浪费在思考标签上</div>
+    <div class="k">收益</div><div class="v">与其他方案行为一致，保证对比公平</div>
+  </div>
+</div>
+</section>
+
+<!-- ================= 8 ================= -->
+<section id="s8">
+<h2><span class="num">8</span>主结果与分布</h2>
+<p class="sub">全部在 val（300 篇，未参与训练）上评测。</p>
+
+<h3>8.1 主结果表</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr>
+    <th>配置</th><th>引擎</th><th class="n">NC</th><th class="n">Np</th><th class="n">Ng</th>
+    <th class="n">P</th><th class="n">R</th><th class="n">F1</th><th class="n">α</th>
+    <th class="n">抽取(80%)</th><th class="n">ROUGE-L</th><th class="n">BERTScore</th>
+    <th class="n">预测(20%)</th><th class="n">综合</th></tr></thead>
+  <tbody>
+    <tr><td>基座·零训练</td><td>HF</td><td class="n">767</td><td class="n">1719</td><td class="n">1421</td><td class="n">0.446</td><td class="n">0.540</td><td class="n">0.489</td><td class="n">0.764</td><td class="n">0.373</td><td class="n">0.116</td><td class="n">0.410</td><td class="n">0.263</td><td class="n">0.3511</td></tr>
+    <tr><td>SFT r16（2轮）</td><td>HF</td><td class="n">1007</td><td class="n">1404</td><td class="n">1421</td><td class="n">0.717</td><td class="n">0.709</td><td class="n">0.713</td><td class="n">0.825</td><td class="n">0.588</td><td class="n">0.214</td><td class="n">0.581</td><td class="n">0.398</td><td class="n">0.5498</td></tr>
+    <tr><td>SFT r32（2轮）</td><td>HF</td><td class="n">1017</td><td class="n">1411</td><td class="n">1421</td><td class="n">0.721</td><td class="n">0.716</td><td class="n">0.718</td><td class="n">0.823</td><td class="n">0.591</td><td class="n">0.213</td><td class="n">0.585</td><td class="n">0.399</td><td class="n">0.5527</td></tr>
+    <tr><td>SFT r32（2轮）</td><td>vLLM</td><td class="n">1016</td><td class="n">1402</td><td class="n">1421</td><td class="n">0.725</td><td class="n">0.715</td><td class="n">0.720</td><td class="n">0.823</td><td class="n">0.593</td><td class="n">0.211</td><td class="n">0.585</td><td class="n">0.398</td><td class="n">0.5538</td></tr>
+    <tr class="best"><td>SFT r32 ＋ ⑥立场校准 ★</td><td>HF</td><td class="n">1043</td><td class="n">1411</td><td class="n">1421</td><td class="n">0.739</td><td class="n">0.734</td><td class="n">0.737</td><td class="n">0.825</td><td class="n">0.608</td><td class="n">0.217</td><td class="n">0.599</td><td class="n">0.408</td><td class="n">0.5678</td></tr>
+    <tr style="color:#64748b"><td>参照上界·答案照抄</td><td>—</td><td class="n">1421</td><td class="n">1421</td><td class="n">1421</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.0000</td></tr>
+    <tr style="color:#64748b"><td>参照·整篇原文当证据</td><td>—</td><td class="n">1393</td><td class="n">1421</td><td class="n">1421</td><td class="n">0.980</td><td class="n">0.980</td><td class="n">0.980</td><td class="n">0.677</td><td class="n">0.664</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">0.7309</td></tr>
+  </tbody>
+</table></div>
+
+<div class="note green" style="margin-top:14px">
+  <b>14B → 32B 对比（32B 总最佳 0.6082）</b><br>
+  基座升级对<b>抽取</b>帮助巨大（extract +0.057；F1 +0.036、α +0.024）——正好补在我们诊断出的「命名口径 / 证据选句」短板上。<br>
+  <b style="color:var(--red)">但"未来论点"反而退步（0.408 → 0.380）</b>，成为 32B 当前最大的单点短板：若能把 future 提到 0.55，总分可达 <b>≈0.64</b>。
+</div>
+
+<h3>8.2 收益瀑布</h3>
+<div class="card">
+  <div class="wf">
+    <div class="wfi"><div class="wfseg" style="height:35.1%;background:#cdd7e6;color:#33415c">0.3511</div><div class="wflbl">基座</div></div>
+    <div class="wfi"><div class="wfseg" style="height:19.9%;background:var(--green)">+0.1987</div><div class="wflbl">r16 微调</div></div>
+    <div class="wfi"><div class="wfseg" style="height:2.2%;background:#7ee2a8;min-height:16px">+0.003</div><div class="wflbl">r32</div></div>
+    <div class="wfi"><div class="wfseg" style="height:2.2%;background:#7ee2a8;min-height:16px">+0.001</div><div class="wflbl">vLLM</div></div>
+    <div class="wfi"><div class="wfseg" style="height:2.2%;background:var(--blue);min-height:16px">+0.015</div><div class="wflbl">⑥ 校准</div></div>
+    <div class="wfi"><div class="wfseg" style="height:56.8%;background:linear-gradient(180deg,#2563eb,#0b1220)">0.5678</div><div class="wflbl">当前最佳</div></div>
+  </div>
+  <p style="font-size:13.2px;color:#64748b;margin:2px 0 0">柱高按综合分绝对值绘制。<b>微调贡献了绝大多数提升</b>；后处理里只有 ⑥ 有效。</p>
+</div>
+
+<h3>8.3 每样本卡片数分布（解释 Np 为何不同）</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>配置</th><th class="n">总数 Np</th><th class="n">3卡</th><th class="n">4卡</th><th class="n">5卡</th><th class="n">6卡</th><th class="n">7卡</th><th class="n">8卡</th><th class="n">9~15卡</th></tr></thead>
+  <tbody>
+    <tr class="best"><td>金标</td><td class="n">1421</td><td class="n">2</td><td class="n">64</td><td class="n">231</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+    <tr><td>基座·零训练</td><td class="n">1719</td><td class="n">8</td><td class="n">52</td><td class="n">115</td><td class="n">53</td><td class="n">27</td><td class="n">24</td><td class="n">34</td></tr>
+    <tr><td>SFT r16</td><td class="n">1404</td><td class="n">4</td><td class="n">89</td><td class="n">206</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+    <tr><td>SFT r32（HF）</td><td class="n">1411</td><td class="n">3</td><td class="n">83</td><td class="n">214</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+    <tr><td>SFT r32（vLLM）</td><td class="n">1402</td><td class="n">3</td><td class="n">92</td><td class="n">205</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+  </tbody>
+</table></div>
+<div class="note blue">Np 不是设定值而是结果：模型对每篇文档<b>自己决定输出几张卡</b>。基座严重虚报（最多 15 张）→ 准确率被拉低；SFT 后收敛到 4~5 张，与金标齐平。<b>这就是 ⑦ 无操作空间的直接原因。</b></div>
+
+<h3>8.4 立场分布（val，⑥ 校准前后）</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>来源</th><th class="n">support</th><th class="n">neutral</th><th class="n">oppose</th></tr></thead>
+  <tbody>
+    <tr class="best"><td>金标</td><td class="n">862</td><td class="n">517</td><td class="n">42</td></tr>
+    <tr><td>模型（校准后）</td><td class="n">891</td><td class="n">485</td><td class="n">35</td></tr>
+  </tbody>
+</table></div>
+</section>
+
+<!-- ================= 9 ================= -->
+<section id="s9">
+<h2><span class="num">9</span>失败归因诊断（Phase 0）</h2>
+<p class="sub">这是全场信息量最大的一步：把"分数不够高"拆成三类可操作的问题。</p>
+
+<h3>9.1 未匹配金标卡的归因（共 378 张）</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>原因</th><th class="n">数量</th><th class="n">占比 Ng</th><th>含义与启示</th></tr></thead>
+  <tbody>
+    <tr><td>配上了对，但相似度 ≤ 0.7</td><td class="n"><b>194</b></td><td class="n">13.7%</td><td>议题找对了，卡也配上了，但<b>名字/证据不够像</b> → 命名口径问题</td></tr>
+    <tr><td>没有同立场的预测卡</td><td class="n">101</td><td class="n">7.1%</td><td>被<b>立场硬门槛</b>直接卡死 → ⑥ 校准的用武之地</td></tr>
+    <tr><td>最佳候选相似度 ≤ 0.7</td><td class="n">64</td><td class="n">4.5%</td><td>有同立场候选，但都不够像</td></tr>
+    <tr><td>被其他卡片抢走配对</td><td class="n">19</td><td class="n">1.3%</td><td>一对一匹配的挤占</td></tr>
+  </tbody>
+</table></div>
+
+<h3>9.2 近失分布：只差一点点</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>最佳相似度区间</th><th class="n">数量</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td>(0.65, 0.70]</td><td class="n">76</td><td rowspan="2" style="background:#f0fdf4"><b>共 145 张只差 0.05~0.10 就能过线</b> —— 微小的口径改善就能换来一大片得分</td></tr>
+    <tr><td>(0.60, 0.65]</td><td class="n">69</td></tr>
+    <tr><td>(0.50, 0.60]</td><td class="n">64</td><td>差距中等</td></tr>
+    <tr><td>(0.40, 0.50]</td><td class="n">18</td><td>差距较大</td></tr>
+    <tr><td>≤ 0.40</td><td class="n">4</td><td>基本不相关</td></tr>
+  </tbody>
+</table></div>
+<div class="note"><b>近失对拆解</b>：cos(议题名) 均值 <b>0.52</b>（差）｜ cos(证据) 均值 <b>0.70</b>（较好）。→ <b>短板在议题命名口径</b>，不在证据。<br>
+<b>两个诊断用上界（含标签泄漏，仅用于归因）</b>：若证据与金标完全一致，277 张近失中 276 张过线；若议题名与金标一致，267 张过线。</div>
+
+<h3>9.3 证据逐字率：模型早就会"照抄"</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>指标</th><th class="n">金标</th><th class="n">模型预测</th><th>结论</th></tr></thead>
+  <tbody>
+    <tr><td>证据条目逐字率</td><td class="n">100%</td><td class="n"><b>99.18%</b></td><td>仅 30 条非逐字，且相似度≈1.0 → <b>原计划"强制逐字"无价值</b></td></tr>
+    <tr><td>每卡证据条数分布</td><td class="n">{1:159, 2:485, 3:777}</td><td class="n">{1:92, 2:378, 3:940, 5:1}</td><td>模型条数略多</td></tr>
+    <tr><td>单条证据字数（中位）</td><td class="n">48</td><td class="n">47</td><td>长度几乎一致</td></tr>
+  </tbody>
+</table></div>
+
+<h3>9.4 未来论点：纯生成任务</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>指标</th><th class="n">金标</th><th class="n">模型预测</th><th>结论</th></tr></thead>
+  <tbody>
+    <tr><td>逐字率</td><td class="n"><b>0%</b></td><td class="n">0%</td><td>不可能从原文抄 → 只能靠训练生成</td></tr>
+    <tr><td>与原文的字符片段重合（中位）</td><td class="n">0.418</td><td class="n">0.429</td><td>模型与金标的<b>生成风格已对齐</b></td></tr>
+    <tr><td>字数（中位）</td><td class="n">78</td><td class="n">76</td><td>长度一致</td></tr>
+  </tbody>
+</table></div>
+
+<h3>9.5 议题命名的"口径差"（根因）</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>指标</th><th class="n">金标</th><th class="n">模型</th><th>解读</th></tr></thead>
+  <tbody>
+    <tr><td>议题名是原文子串的比例</td><td class="n">13.7%</td><td class="n"><b>23.7%</b></td><td rowspan="2">金标是<b>抽象概括</b>，模型偏<b>贴原文</b></td></tr>
+    <tr><td>与原文最长公共子串覆盖率</td><td class="n">0.567</td><td class="n"><b>0.655</b></td></tr>
+    <tr><td>含"与"的复合议题名</td><td class="n">486 / 1421</td><td class="n">398 / 1411</td><td>金标更常用"X 与 Y"式复合概括</td></tr>
+  </tbody>
+</table></div>
+<div class="note red"><b>核心矛盾</b>：模型的命名风格与金标<b>系统性相反</b>——它比金标更"忠实原文"，而金标要的是"提炼概括"。这解释了 cos(议题名)=0.52 的短板，也解释了为什么"加指令"和"采样投票"都无效（见第 11 节）。</div>
+
+<h3>9.6 ⑥ 变体扫尾（零 GPU）</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>变体</th><th class="n">F1</th><th>结论</th></tr></thead>
+  <tbody>
+    <tr class="best"><td>全局先验（采用）</td><td class="n">0.7366</td><td>基线最优</td></tr>
+    <tr><td>按位置先验</td><td class="n">0.7359</td><td>不超基线</td></tr>
+    <tr><td>置信门控 τ=0.6 / 0.7 / 0.8 / 0.9</td><td class="n">0.7331 ~ 0.7366</td><td>均不超基线</td></tr>
+  </tbody>
+</table></div>
+<p style="font-size:13.6px;color:#64748b">→ ⑥ 已到极限，定格在全局先验（综合 0.5678）。</p>
+</section>
+
+<!-- ================= 10 ================= -->
+<section id="s10">
+<h2><span class="num">10</span>真实案例</h2>
+<p class="sub">全部来自 val 集的真实预测，适合直接讲解。</p>
+
+<h3>10.1 八个"近失对"全表（配上了对、只差阈值）</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>文档</th><th>模型起的议题名</th><th>金标议题名</th><th class="n">名相似</th><th class="n">证据相似</th><th class="n">合计</th></tr></thead>
+  <tbody>
+    <tr><td>0005</td><td><span class="tag t-pred">模型</span>过境口岸升级</td><td><span class="tag t-gold">金标</span>联合巡逻机制</td><td class="n">0.34</td><td class="n">0.83</td><td class="n">0.637</td></tr>
+    <tr><td>0005</td><td><span class="tag t-pred">模型</span>联合巡逻机制</td><td><span class="tag t-gold">金标</span>口岸升级与班列运量</td><td class="n">0.39</td><td class="n">0.79</td><td class="n">0.628</td></tr>
+    <tr><td>0007</td><td><span class="tag t-pred">模型</span>气候变化与地区安全</td><td><span class="tag t-gold">金标</span>气候与安全议题对话</td><td class="n">0.80</td><td class="n">0.62</td><td class="n">0.691</td></tr>
+    <tr><td>0007</td><td><span class="tag t-pred">模型</span>气候变化与地区安全</td><td><span class="tag t-gold">金标</span>可再生能源目标与资金技术支持</td><td class="n">0.41</td><td class="n">0.81</td><td class="n">0.649</td></tr>
+    <tr><td>0008</td><td><span class="tag t-pred">模型</span>DART任务验证偏转</td><td><span class="tag t-gold">金标</span>动能撞击偏转技术</td><td class="n">0.48</td><td class="n">0.82</td><td class="n">0.684</td></tr>
+    <tr><td>0011</td><td><span class="tag t-pred">模型</span>儿童心理创伤与教育中断</td><td><span class="tag t-gold">金标</span>冲突中儿童教育权</td><td class="n">0.59</td><td class="n">0.66</td><td class="n">0.632</td></tr>
+    <tr><td>0012</td><td><span class="tag t-pred">模型</span>气候融资承诺</td><td><span class="tag t-gold">金标</span>气候行动与化石燃料转型</td><td class="n">0.55</td><td class="n">0.76</td><td class="n">0.675</td></tr>
+    <tr><td>0014</td><td><span class="tag t-pred">模型</span>APEC开放区域主义</td><td><span class="tag t-gold">金标</span>反对脱钩断链</td><td class="n" style="color:var(--red);font-weight:700">0.26</td><td class="n">0.97</td><td class="n">0.690</td></tr>
+  </tbody>
+</table></div>
+<div class="note">以 0014 为例：<code>0.4×0.26 + 0.6×0.97 = 0.686 &lt; 0.7</code> —— <b>内容全对，名字差一点点，就判"没答对"</b>。</div>
+
+<h3>10.2 证据：同一句话，只是截取不同</h3>
+<div class="grid g2">
+  <div class="card"><span class="tag t-pred">模型证据</span><p style="margin:6px 0 0;font-size:13.8px">双方在联合巡逻机制和过境口岸升级方面取得初步共识</p></div>
+  <div class="card"><span class="tag t-gold">金标证据</span><p style="margin:6px 0 0;font-size:13.8px">据会谈公报显示，双方在联合巡逻机制和过境口岸升级方面取得初步共识</p></div>
+</div>
+<p style="font-size:13.6px;color:#64748b">金标只多了个前缀。说明模型<b>已找对句子</b>，差距在"从哪开始截"。</p>
+
+<div class="grid g2" style="margin-top:10px">
+  <div class="card"><span class="tag t-pred">模型证据</span><p style="margin:6px 0 0;font-size:13.8px">技术发展——从地基望远镜到太空哨兵任务，如美国"双小行星改道测试"（DART）任务成功验证动能撞击偏</p></div>
+  <div class="card"><span class="tag t-gold">金标证据</span><p style="margin:6px 0 0;font-size:13.8px">美国"双小行星改道测试"（DART）任务成功验证动能撞击偏转</p></div>
+</div>
+<p style="font-size:13.6px;color:#64748b">同样是"多带了前缀/截短了一点"。</p>
+
+<h3>10.3 证据链引用的三种典型形态</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>形态</th><th>例</th><th>得分影响</th></tr></thead>
+  <tbody>
+    <tr><td>逐字完全相同</td><td>模型句 = 金标句</td><td>证据相似度 ≈ 1.0</td></tr>
+    <tr><td>同句 ± 前后缀（最常见）</td><td>模型少了"据会谈公报显示，"</td><td>证据相似 0.8~0.97</td></tr>
+    <tr><td>相邻句 / 换了一段</td><td>引用了同段的另一句</td><td>证据相似 0.6~0.8 → 容易跌破阈值</td></tr>
+  </tbody>
+</table></div>
+</section>
+
+<!-- ================= 11 ================= -->
+<section id="s11">
+<h2><span class="num">11</span>三个关键发现</h2>
+<div class="grid g3">
+  <div class="card exp info"><h3>① 不是"读不懂"，是"起名口径"不同</h3>
+    <p style="font-size:13.8px">金标偏概括性主题词，模型偏爱照抄原文。意思对了，名字对不上，占判定权重 40% 的议题名项白白流失；近失卡 145 张只差 0.05~0.10。</p></div>
+  <div class="card exp info"><h3>② 证据早已"逐字抄"（99.2%）</h3>
+    <p style="font-size:13.8px">原计划教它"照抄原文"，一查发现它早会了。真正的问题是<b>内容里那么多句子，它选了哪一句、从哪开始截</b>。</p></div>
+  <div class="card exp info"><h3>③ 错误是"系统性"的，不是"随机"的</h3>
+    <p style="font-size:13.8px">同一篇答 5 遍投票，结果<b>更差</b>（−0.043）。因为它每次都往同一方向偏。投票救不了系统偏差，只能靠重训。</p></div>
+</div>
+<div class="note green" style="margin-top:14px"><b>方法论价值</b>：这三条把"分数低"从模糊感受变成了三个明确的技术靶点，并据此排除了 5 个"看起来有用、实则无效"的优化方向（⑦⑧、指令、采样投票、Liger）。</div>
+</section>
+
+<!-- ================= 12 ================= -->
+<section id="s12">
+<h2><span class="num">12</span>下一步</h2>
+<div class="grid g2">
+  <div class="card"><span class="badge b-run">进行中</span><h3 style="margin:8px 0 4px">E11 · 字段加权重训</h3>
+    <p style="font-size:13.8px;color:#475569">对议题名（×2）、立场（×3）、未来论点（×2）加权，3 轮；同时跑不加权 3 轮对照。用于干净回答"加权是否有效"。</p>
+    <p style="font-size:13.2px;color:#64748b;margin:8px 0 0">验收链：vLLM 推理 → rescore → 按同配方重拟 ⑥ → 全量评分，与 0.5678 同口径对比。</p></div>
+  <div class="card"><span class="badge b-info">计划</span><h3 style="margin:8px 0 4px">正式上 Qwen3-32B</h3>
+    <p style="font-size:13.8px;color:#475569">合规要求基座为 32B。把 14B 上验证过的方法论（含有效/无效清单）整体平移，避免重复试错。</p>
+    <p style="font-size:13.2px;color:#64748b;margin:8px 0 0">可行性思路：4bit 量化 + LoRA，或 GPTQ-Int4 版本 + vLLM LoRA。</p></div>
+  <div class="card"><span class="badge b-info">储备</span><h3 style="margin:8px 0 4px">证据选句质量</h3>
+    <p style="font-size:13.8px;color:#475569">诊断显示"选哪句、从哪截"是关键。可探索基于原文片段的约束式选句，锁住占判定权重 60% 的证据项。</p></div>
+  <div class="card"><span class="badge b-info">储备</span><h3 style="margin:8px 0 4px">未来论点生成</h3>
+    <p style="font-size:13.8px;color:#475569">占 20% 权重、当前 ROUGE-L 仅 0.21，是最大单点短板；随 E11 的字段加权一并优化。</p></div>
+</div>
+</section>
+
+<!-- ================= 13 ================= -->
+<section id="s13">
+<h2><span class="num">13</span>附录</h2>
+
+<h3>13.1 脚本清单</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>脚本</th><th>作用</th></tr></thead>
+  <tbody>
+    <tr><td><code>build_sft.py</code></td><td>竞赛数据 → 对话式 SFT 数据</td></tr>
+    <tr><td><code>train_lora.py</code></td><td>LoRA/QLoRA 训练（completions-only + think mask）</td></tr>
+    <tr><td><code>train_lora_v2.py</code></td><td>字段加权重训（加权交叉熵 + 分块计算）</td></tr>
+    <tr><td><code>infer.py</code> / <code>infer_vllm.py</code></td><td>HF / vLLM 推理，输出提交格式</td></tr>
+    <tr><td><code>sample_vllm.py</code></td><td>多采样（n 次/题，用于自一致性实验）</td></tr>
+    <tr><td><code>eval_scorer.py</code></td><td>官方评分逻辑复刻（BGE + BERTScore）</td></tr>
+    <tr><td><code>rescore.py</code></td><td>对预测卡前向取三分类立场概率</td></tr>
+    <tr><td><code>fit_bias.py</code> / <code>apply_stance_calib.py</code></td><td>⑥ 偏置拟合与应用</td></tr>
+    <tr><td><code>postprocess.py</code> / <code>postpipeline.py</code></td><td>⑥⑦⑧ 后处理矩阵</td></tr>
+    <tr><td><code>sc_merge.py</code></td><td>自一致性合并（SC-merge）</td></tr>
+    <tr><td><code>diag_phase0.py</code> / <code>analyze_names.py</code></td><td>失败归因与命名口径分析</td></tr>
+    <tr><td><code>ms_dl.py</code></td><td>ModelScope 断点续传下载器</td></tr>
+    <tr><td><code>pipeline.py</code> / <code>run_all.sh</code></td><td>无人值守主流水线（幂等 + 可续跑）</td></tr>
+    <tr><td><code>phase1.sh</code> / <code>phase2.sh</code></td><td>Phase 1 / Phase 2 实验编排</td></tr>
+  </tbody>
+</table></div>
+
+<h3>13.2 术语表</h3>
+<div class="tbl-wrap"><table>
+  <thead><tr><th>术语</th><th>含义</th></tr></thead>
+  <tbody>
+    <tr><td>SFT</td><td>监督微调：用标准答案教模型完成任务</td></tr>
+    <tr><td>LoRA</td><td>低秩适配：只训练少量增量参数，省显存</td></tr>
+    <tr><td>completions-only</td><td>只在答案部分计算 loss，题面不算</td></tr>
+    <tr><td>α（alpha 系数）</td><td>评分中"证据像不像原文"的系数</td></tr>
+    <tr><td>NC / Np / Ng</td><td>配对成功数 / 预测卡数 / 金标卡数</td></tr>
+    <tr><td>P / R / F1</td><td>准确率 / 召回率 / 调和平均</td></tr>
+    <tr><td>ROUGE-L / BERTScore</td><td>字面重合度 / 语义相似度</td></tr>
+    <tr><td>val 验收制</td><td>所有改动用有标签的 val 验证，通过才上 test</td></tr>
+    <tr><td>SC-merge</td><td>自一致性合并：多次采样后投票取共识</td></tr>
+    <tr><td>vLLM</td><td>高吞吐推理引擎</td></tr>
+  </tbody>
+</table></div>
+
+<h3>13.3 常见问题（FAQ）</h3>
+<div class="grid g2">
+  <div class="card"><b>Q：为什么 test 上不能反复调参？</b><p style="font-size:13.6px;margin:6px 0 0">test 无标签，改了也不知道好不好，等于盲试；且会把测试集信息"泄漏"进方案。所以一律在 val 验收。</p></div>
+  <div class="card"><b>Q：为什么多输出（基座 1719 张）会被扣分？</b><p style="font-size:13.6px;margin:6px 0 0">准确率 P = NC/Np，多吐的卡配不上对，直接拉低 P。</p></div>
+  <div class="card"><b>Q：为什么"整篇原文当证据"能拿 0.73？</b><p style="font-size:13.6px;margin:6px 0 0">因为那行探针抄了金标的议题名和立场，只剩证据一项在测；而 0.6 权重的证据项阈值很宽松（整篇原文通常也 &gt;0.5）。</p></div>
+  <div class="card"><b>Q：为什么投票合并反而不行？</b><p style="font-size:13.6px;margin:6px 0 0">因为模型是"系统性偏差"：5 次都往同一方向偏，众数也一样偏；投票只能消除随机噪声。</p></div>
+  <div class="card"><b>Q：为什么要先用 14B？</b><p style="font-size:13.6px;margin:6px 0 0">32B 训练与推理成本高。在 14B 上把"哪些方法有效、哪些无效"摸清楚，再上 32B 只做一次高质量训练。</p></div>
+  <div class="card"><b>Q：本地评分器和官方一致吗？</b><p style="font-size:13.6px;margin:6px 0 0">按官方规则复刻，并用两个探针自检：答案照抄 = 1.0000，整篇原文 = 0.7309，逻辑自洽。</p></div>
+</div>
+
+<h3>13.4 可复现性与运维</h3>
+<div class="grid g2">
+  <div class="card"><b>断点续跑</b><p style="font-size:13.6px;margin:6px 0 0">所有阶段带完成标记（DONE 文件 / adapter 存在性判断），失败自动重试，训练从最近 checkpoint 恢复。</p></div>
+  <div class="card"><b>无人值守</b><p style="font-size:13.6px;margin:6px 0 0">后台 setsid + nohup + 看门狗；GPU 残留进程自动清理。</p></div>
+  <div class="card"><b>依赖隔离</b><p style="font-size:13.6px;margin:6px 0 0">训练环境与 vLLM 环境分离；镜像源固定为国内源；运行期零外网依赖。</p></div>
+  <div class="card"><b>产物</b><p style="font-size:13.6px;margin:6px 0 0">适配器、预测、评分报告、偏置文件、最终提交（result_final.jsonl）全部落盘可追溯。</p></div>
+</div>
+
+<div class="foot">谈判观点挖掘 · 项目成果详解 ｜ 数据截至 2026-10-02 ｜ 所有分数均为 val（300 篇）评测 ｜ 单文件离线网页，可打印为 PDF</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

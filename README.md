@@ -1,0 +1,222 @@
+# 谈判观点挖掘 · Negotiation Opinion Mining
+
+> 用 Qwen3 对**外交 / 时政长文本**做结构化观点挖掘：抽取多议题、判定立场、引用原文证据，并预测未来表态。
+>
+> 本仓库包含完整的**可复现流水线**、**1:1 复刻的官方评分器**、以及全部实验记录（含证伪项）。
+
+---
+
+## 任务定义
+
+给定一篇文档（约 1500 字），输出一个 JSON：
+
+```json
+{
+  "issue_list": [
+    { "issue_name": "反对脱钩断链",
+      "stance": "support",                              // support / oppose / neutral
+      "argument_chain": ["原文逐字句子1", "原文逐字句子2"] }
+  ],
+  "future_argument": ["与第 1 张卡一一对应的未来表态预测（80~120 字）"]
+}
+```
+
+- `argument_chain` 必须是**原文的逐字子串**；
+- `future_argument` 条数必须与 `issue_list` **一一对应**；
+- 一篇文档通常含 4~5 个议题。
+
+---
+
+## 主结果（验证集 300 篇）
+
+综合分 = `0.8 × (F1 × α) + 0.2 × 预测得分`
+
+| 配置 | 引擎 | F1 | α | 抽取(80%) | 未来(20%) | **综合** |
+|---|---|---:|---:|---:|---:|---:|
+| Qwen3-14B 基座·零训练 | HF | 0.489 | 0.764 | 0.373 | 0.263 | 0.3511 |
+| + SFT LoRA r16（2 轮） | HF | 0.713 | 0.825 | 0.588 | 0.398 | 0.5498 |
+| + SFT LoRA r32（2 轮） | HF | 0.718 | 0.823 | 0.591 | 0.399 | 0.5527 |
+| + vLLM 推理（无损加速 8.7×） | vLLM | 0.720 | 0.823 | 0.593 | 0.398 | 0.5538 |
+| **+ ⑥ 立场校准（14B 最佳）** | HF | 0.737 | 0.825 | 0.608 | 0.408 | **0.5678** |
+| **Qwen3-32B** | — | 0.773 | 0.849 | 0.665 | 0.380 | **0.6082** ★ |
+
+- 参照上界：答案原样提交 = **1.0000**；整篇原文当证据 = **0.7309**（用于验证评分器与暴露规则特性）。
+
+---
+
+## 核心发现
+
+1. **不是"读不懂"，是"起名口径"不同** —— 金标偏爱**概括性主题词**（如「反对脱钩断链」），模型偏爱**贴原文**（如「APEC 开放区域主义」）。议题名占判定权重 40%，大量"近失卡"只差 0.05~0.10。
+2. **证据早已逐字摘抄（99.2%）** —— 模型不需要"教它照抄"，真正的差距在**选哪一句、从哪开始截**。
+3. **错误是系统性的，不是随机噪声** —— 同一题采样 5 次取共识（SC-merge）**反而更差**（−0.043），因为偏差每次都朝同一方向，投票无法纠正。
+
+---
+
+## 技术流水线
+
+```
+原始数据 ──build_sft.py──▶ 对话式 SFT 数据
+                              │
+                     train_lora.py / train_lora_v2.py   (LoRA 微调, completions-only)
+                              │
+                     infer_vllm.py                       (vLLM 推理, 8.7× 加速)
+                              │
+                     eval_scorer.py                      (官方评分逻辑 1:1 复刻)
+                              │
+       ┌──────────────────────┼──────────────────────┐
+       │                      │                      │
+postprocess.py(⑥⑦⑧)   fit_bias.py + apply_stance_calib.py   sc_merge.py
+       │                    (⑥ 立场校准, 唯一有效)         (自一致性合并, 已证伪)
+       └──────────────────────┴──────────────────────┘
+                              │
+                     result_final.jsonl (提交)
+```
+
+### 关键设计
+- **只在答案上算 loss（completions-only）**，并按官方 `loss_scale=ignore_empty_think` 忽略空 think 块；
+- **训练 / 推理统一 `enable_thinking=False`**；
+- **val 验收制**：任何改动用有标签的 val 验证，通过才应用于 test；
+- **断点续跑**：每个阶段有完成标记，训练可从 checkpoint 恢复。
+
+---
+
+## 实验记录
+
+### ✅ 有效
+| 实验 | 说明 | 收益 |
+|---|---|---|
+| SFT LoRA r16（2 轮） | 14B + LoRA，completions-only | **+0.1987** |
+| SFT LoRA r32（2 轮） | 仅加大 LoRA 秩 | +0.0029（说明 rank 已饱和） |
+| vLLM 推理 | PagedAttention + 连续批处理 | 生成 **8.7×**，任务级无损 |
+| ⑥ 立场校准 | 无标签先验匹配，校准立场分布 | **+0.0151** |
+
+### ❌ 证伪（同样重要，避免重复试错）
+| 实验 | 结论 |
+|---|---|
+| ⑦ 卡片数截断 | 模型本就输出 4~5 张，无截断空间 |
+| ⑧ 近重复去重 | 输出几乎无重复，去重反伤基线 |
+| Liger 融合核 | 瓶颈在 CPU，无提升 |
+| prompt 追加指令 | 分布外扰动，−0.018 |
+| **SC-merge 自一致性合并** | **系统性偏差无法投票纠正，−0.043~−0.088** |
+
+### 🔄 进行中
+- **字段加权重训**：对 `issue_name` ×2、`stance` ×3、`future_argument` ×2 的 token 加权（自定义加权交叉熵 + 分块计算防 OOM）。
+
+---
+
+## 目录结构
+
+```
+.
+├── src/                     # 核心算法脚本
+│   ├── build_sft.py         #   竞赛数据 → 对话式 SFT 数据
+│   ├── train_lora.py        #   LoRA 训练
+│   ├── train_lora_v2.py     #   字段加权重训
+│   ├── infer.py             #   HF 推理
+│   ├── infer_vllm.py        #   vLLM 推理
+│   ├── sample_vllm.py       #   多采样（自一致性实验）
+│   ├── eval_scorer.py       #   官方评分逻辑复刻
+│   ├── rescore.py           #   立场概率前向
+│   ├── fit_bias.py          #   ⑥ 偏置拟合
+│   ├── apply_stance_calib.py#   ⑥ 偏置应用
+│   ├── postprocess.py       #   ⑥⑦⑧ 后处理矩阵
+│   ├── sc_merge.py          #   自一致性合并
+│   ├── diag_phase0.py       #   失败归因诊断
+│   ├── analyze_names.py     #   议题命名口径分析
+│   ├── ms_dl.py             #   ModelScope 断点续传下载
+│   └── pipeline.py          #   无人值守主流水线
+├── scripts/                 # 编排 / 部署脚本
+├── docs/                    # 报告与演示材料
+└── data/                    # 数据说明 + 样例（完整数据需自行获取）
+```
+
+---
+
+## 快速开始
+
+### 1. 环境
+
+```bash
+# 训练 / 评测环境
+pip install -r requirements.txt
+
+# 推理加速环境（建议独立 venv；无 nvcc 的机器必须关闭 FlashInfer）
+python -m venv .venv-accel && . .venv-accel/bin/activate
+pip install vllm
+export VLLM_USE_FLASHINFER_SAMPLER=0
+```
+
+> **国内网络**：模型走 **ModelScope（模搭）**下载；pip 建议使用清华镜像
+> `-i https://pypi.tuna.tsinghua.edu.cn/simple`。
+
+### 2. 数据准备
+
+```bash
+# 将 train.jsonl / val.jsonl / test.jsonl 放入 data/
+python src/build_sft.py --inp data/train.jsonl --out data/sft_train.jsonl --labeled
+python src/build_sft.py --inp data/val.jsonl   --out data/sft_val.jsonl   --labeled
+python src/build_sft.py --inp data/test.jsonl  --out data/sft_test.jsonl
+head -400 data/sft_train.jsonl > data/sft_calib.jsonl   # 校准集(可选)
+```
+
+### 3. 训练
+
+```bash
+python src/train_lora.py --out outputs/qwen3-14b-lora-r32 \
+    --epochs 2 --max-len 6144 --lora-r 32 --lora-alpha 64 \
+    --lr 1e-4 --grad-accum 16
+```
+
+### 4. 推理与评测
+
+```bash
+# vLLM 推理
+.venv-accel/bin/python src/infer_vllm.py --data data/sft_val.jsonl \
+    --out eval/pred_r32_val.jsonl --adapter outputs/qwen3-14b-lora-r32
+
+# 官方口径评分
+python src/eval_scorer.py --gold data/val.jsonl --pred eval/pred_r32_val.jsonl \
+    --device cuda --out eval/report_r32.json
+```
+
+### 5. ⑥ 立场校准
+
+```bash
+python src/rescore.py --data data/sft_val.jsonl --pred eval/pred_r32_val.jsonl \
+    --out eval/rescore_r32_val.jsonl --adapter outputs/qwen3-14b-lora-r32
+python src/fit_bias.py --rescore eval/rescore_r32_val.jsonl --out eval/bias.json
+python src/apply_stance_calib.py --pred eval/pred_r32_val.jsonl \
+    --rescore eval/rescore_r32_val.jsonl \
+    --b-neutral 0.7 --b-oppose -0.5 --out eval/pred_r32_val_cal6.jsonl
+```
+
+### 6. 一键流水线
+
+```bash
+bash scripts/run_all.sh      # 幂等 + 断点续跑
+```
+
+---
+
+## 评分规则（复刻口径）
+
+```
+语义等价分 = 0.4 × cos(议题名) + 0.6 × cos(证据链)      # bge-small-zh-v1.5
+立场必须严格相等（硬门槛），一对一匹配（匈牙利算法），阈值 0.7 → NC
+P = NC/Np    R = NC/Ng    F1 = 2PR/(P+R)
+α = 匹配对的 BERTScore-F1 均值                          # bert-base-chinese
+抽取分 = F1 × α                (占 80%)
+未来分 = (ROUGE-L + BERTScore)/2  (占 20%)
+综合分 = 0.8 × 抽取分 + 0.2 × 未来分
+```
+
+> 自检：把标准答案原样提交得 **1.0000**；把整篇原文当证据得 **0.7309**。
+
+---
+
+## 说明
+
+- **数据**：比赛数据版权归赛事方，本仓库**不含完整数据**，仅提供 `data/sample_val.jsonl`（2 条样例）。
+- **模型**：Qwen3 系列模型请通过 [ModelScope](https://modelscope.cn) 获取。
+- **合规**：正式提交按要求使用 **Qwen3-32B** 作为基座。
+- 本仓库用于技术交流与复现，请遵守赛事相关规定。

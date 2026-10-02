@@ -1,0 +1,15 @@
+# 训练 / 评测环境 (HF stack)
+torch>=2.4
+transformers>=4.46
+peft>=0.13
+accelerate>=1.0
+bitsandbytes>=0.44
+datasets>=3.0
+sentence-transformers>=3.0
+bert-score>=0.3.13
+scipy
+numpy
+requests
+
+# 推理加速 (建议独立虚拟环境安装, 见 README)
+# vllm

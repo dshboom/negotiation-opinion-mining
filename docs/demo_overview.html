@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>谈判观点挖掘 · 项目成果演示</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#ffffff; --ink:#0f172a; --muted:#5b6b82; --line:#e3e9f2;
+    --blue:#2563eb; --blue-soft:#e8efff; --green:#15a34a; --green-soft:#e6f6ec;
+    --red:#dc2626; --red-soft:#fdeaea; --amber:#d97706; --amber-soft:#fdf3e3;
+    --purple:#7c3aed; --purple-soft:#f1eaff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;
+       line-height:1.75;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue);text-decoration:none}
+  header.hero{background:linear-gradient(135deg,#0b1220 0%,#122a52 55%,#1d4ed8 130%);color:#fff;padding:56px 32px 44px}
+  .hero-inner{max-width:1120px;margin:0 auto}
+  .hero h1{margin:0 0 10px;font-size:38px;letter-spacing:.5px}
+  .hero p{margin:0;color:#cfe0ff;font-size:17px;max-width:860px}
+  .hero .kpis{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px}
+  .kpi{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:14px;padding:14px 20px;min-width:150px}
+  .kpi b{display:block;font-size:26px;line-height:1.25}
+  .kpi span{font-size:12.5px;color:#bcd3ff}
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--line);padding:0 20px}
+  nav .nin{max-width:1120px;margin:0 auto;display:flex;gap:4px;overflow-x:auto}
+  nav a{padding:13px 13px;font-size:14px;color:#42506a;border-bottom:2px solid transparent;white-space:nowrap}
+  nav a:hover{color:var(--blue);border-bottom-color:var(--blue)}
+  main{max-width:1120px;margin:0 auto;padding:34px 20px 80px}
+  section{margin:0 0 46px}
+  h2{font-size:25px;margin:0 0 6px;padding-top:12px}
+  h2 .num{display:inline-block;background:var(--blue);color:#fff;border-radius:9px;
+          font-size:15px;padding:2px 11px;margin-right:11px;vertical-align:2px}
+  .sub{color:var(--muted);margin:0 0 20px;font-size:15px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;
+        box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .badge{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:3px 11px;vertical-align:2px}
+  .b-ok{background:var(--green-soft);color:var(--green)}
+  .b-no{background:var(--red-soft);color:var(--red)}
+  .b-run{background:var(--amber-soft);color:var(--amber)}
+  .b-info{background:var(--blue-soft);color:var(--blue)}
+  .b-gray{background:#eef2f7;color:#64748b}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{background:#f2f6fd;color:#33415c;font-weight:700;font-size:13px}
+  tr:hover td{background:#fafcff}
+  td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+  .best td{background:#f0fdf4!important;font-weight:700}
+  code{background:#f1f5f9;padding:2px 7px;border-radius:6px;font-size:13px;
+       font-family:ui-monospace,Consolas,"Courier New",monospace}
+  pre{background:#0b1220;color:#d7e3ff;padding:16px 18px;border-radius:12px;overflow:auto;font-size:13px;line-height:1.6}
+  pre .k{color:#7dd3fc}.pre .s{color:#86efac}
+  .exp{border-left:5px solid var(--line)}
+  .exp.ok{border-left-color:var(--green)}
+  .exp.no{border-left-color:var(--red)}
+  .exp.run{border-left-color:var(--amber)}
+  .exp.info{border-left-color:var(--blue)}
+  .exp h3{margin:0 0 2px;font-size:18px}
+  .exp .meta{color:var(--muted);font-size:13px;margin-bottom:12px}
+  .kv{display:grid;grid-template-columns:78px 1fr;gap:6px 12px;font-size:14px;margin-top:8px}
+  .kv .k{color:var(--muted);font-weight:700;font-size:13px;padding-top:1px}
+  .kv .v{min-width:0}
+  .gain{font-weight:800}
+  .gain.pos{color:var(--green)}.gain.neg{color:var(--red)}.gain.flat{color:var(--muted)}
+  .bar-wrap{background:#eef2f7;border-radius:8px;height:22px;position:relative;overflow:hidden}
+  .bar{height:100%;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;
+       padding-right:8px;color:#fff;font-size:12px;font-weight:700;min-width:44px}
+  .waterfall{display:flex;align-items:flex-end;gap:12px;height:250px;padding:12px 6px 0}
+  .wf{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+  .wf .stack{width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+  .wf .seg{width:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11.5px;font-weight:700;overflow:hidden}
+  .wf .lbl{font-size:12px;color:var(--muted);margin-top:8px;text-align:center}
+  .ex{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff}
+  .ex .q{font-size:14px;color:#334155}
+  .ex .a{font-size:14px;margin-top:6px}
+  .tag{display:inline-block;font-size:12px;border-radius:6px;padding:1px 8px;margin-right:6px}
+  .t-gold{background:var(--green-soft);color:var(--green);font-weight:700}
+  .t-pred{background:var(--amber-soft);color:var(--amber);font-weight:700}
+  .t-same{background:var(--blue-soft);color:var(--blue)}
+  .filters{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
+  .filters button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 16px;
+                  font-size:13.5px;cursor:pointer;color:#42506a}
+  .filters button.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+  .note{background:#fffbf0;border:1px solid #f2e2bc;border-radius:12px;padding:13px 16px;font-size:14px;color:#7a5b12}
+  .foot{color:var(--muted);font-size:13px;text-align:center;padding:26px 10px;border-top:1px solid var(--line)}
+  .flow{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
+  .step{flex:1;min-width:170px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+  .step .no{font-size:12px;color:#fff;background:var(--blue);border-radius:7px;padding:1px 8px;display:inline-block;margin-bottom:8px}
+  .arrow{align-self:center;color:#9fb0c8;font-size:20px}
+  @media print{nav{display:none}.hero{padding:26px}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <h1>谈判观点挖掘 · 项目成果</h1>
+    <p>用 Qwen3 长文观点抽取 + 未来表态预测：从 0.3511 提升到 0.5678，并把每个有效 / 无效实验的参数、方法、原理、收益完整归档。</p>
+    <div class="kpis">
+      <div class="kpi"><b>0.6082</b><span>★ 32B 当前最佳（val 300）</span></div>
+      <div class="kpi"><b>0.5678</b><span>14B 最佳（本机）</span></div>
+      <div class="kpi"><b>+0.217</b><span>14B 相对基座提升</span></div>
+      <div class="kpi"><b>8.7×</b><span>vLLM 生成加速</span></div>
+      <div class="kpi"><b>12</b><span>已归档实验</span></div>
+    </div>
+  </div>
+</header>
+
+<nav><div class="nin">
+  <a href="#task">赛题任务</a>
+  <a href="#scoring">评分规则</a>
+  <a href="#pipeline">流水线</a>
+  <a href="#experiments">实验档案</a>
+  <a href="#results">主结果</a>
+  <a href="#cases">真实案例</a>
+  <a href="#findings">关键发现</a>
+  <a href="#next">下一步</a>
+</div></nav>
+
+<main>
+
+<!-- 1 赛题 -->
+<section id="task">
+  <h2><span class="num">1</span>赛题任务：输入一篇文档，输出结构化情报</h2>
+  <p class="sub">给定外交 / 时政长文（约 1500 字），抽取「议题观点」并预测「未来表态」。</p>
+  <div class="grid g2">
+    <div class="card">
+      <b>输入</b>
+      <p style="font-size:14px;color:#475569">文档类型（记者会 / 联合声明 / 评论文章…）、发布日期、正文全文。</p>
+      <pre>文档类型：国际新闻报道
+发布日期：2025-07-26
+
+【文档正文】
+2025年7月26日，全国党史学习教育经验交流会在北京隆重召开……
+（约 1500 字）</pre>
+    </div>
+    <div class="card">
+      <b>输出（一个 JSON）</b>
+      <pre>{
+  "issue_list": [
+    { "issue_name": "反对脱钩断链",
+      "stance": "support",
+      "argument_chain": ["原文原句1", "原文原句2"] },
+    { "issue_name": "…", "stance": "…", "argument_chain": ["…"] }
+  ],
+  "future_argument": ["与第1张卡对应的未来表态预测，80~120字", "…"]
+}</pre>
+      <p style="font-size:13.5px;color:#64748b;margin:8px 0 0">
+        • 证据链必须<b>逐字来自原文</b>　• <code>future_argument</code> 与卡片<b>一一对应</b></p>
+    </div>
+  </div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card"><span class="badge b-info">数据</span><p style="margin:8px 0 0;font-size:14px">train <b>2400</b> 篇（有答案）<br>val <b>300</b> 篇（有答案，自查用）<br>test <b>300</b> 篇（无答案，交卷）</p></div>
+    <div class="card"><span class="badge b-info">基座</span><p style="margin:8px 0 0;font-size:14px">官方指定 <b>Qwen3-32B</b>；本机先用 <b>Qwen3-14B</b> 验证与优化流程，正式提交再上 32B。</p></div>
+    <div class="card"><span class="badge b-info">合规</span><p style="margin:8px 0 0;font-size:14px">训练 / 推理统一关闭思考模式（<code>enable_thinking=False</code>），复刻官方空 think 块忽略策略。</p></div>
+  </div>
+</section>
+
+<!-- 2 评分 -->
+<section id="scoring">
+  <h2><span class="num">2</span>评分规则：80% 抽取 + 20% 预测</h2>
+  <p class="sub">理解评分是理解所有实验的前提——很多"看起来该涨"的操作，都是被规则本身否掉的。</p>
+  <div class="grid g2">
+    <div class="card">
+      <b>观点抽取（占 80%）</b>
+      <div class="kv" style="grid-template-columns:26px 1fr">
+        <div class="k">①</div><div class="v">立场必须<b>完全一致</b>才能配对 —— <b>硬门槛</b></div>
+        <div class="k">②</div><div class="v">语义等价分 = <code>0.4×议题名相似度 + 0.6×证据链相似度</code>，<b>&gt;0.7</b> 才算答对</div>
+        <div class="k">③</div><div class="v">一对一匹配（每张预测卡最多配一张标准卡）</div>
+        <div class="k">④</div><div class="v">乘质量系数 <b>α</b>（证据越像原文越高）</div>
+      </div>
+      <p style="font-size:14px;margin:12px 0 0">
+        <code>P = NC / Np</code>　<code>R = NC / Ng</code>　<code>F1 = 2PR/(P+R)</code><br>
+        <b>抽取得分 = F1 × α</b>
+      </p>
+    </div>
+    <div class="card">
+      <b>未来观点预测（占 20%）</b>
+      <p style="font-size:14px">把预测的「未来表态」与标准答案比对：</p>
+      <div class="kv" style="grid-template-columns:96px 1fr">
+        <div class="k">ROUGE-L</div><div class="v">字面重合度</div>
+        <div class="k">BERTScore</div><div class="v">语义相似度</div>
+      </div>
+      <p style="font-size:14px;margin:12px 0 0"><b>预测得分 = (ROUGE-L + BERTScore) / 2</b></p>
+      <div class="note" style="margin-top:14px">
+        <b>综合分 = 0.8 × (F1 × α) + 0.2 × 预测得分</b>
+      </div>
+      <p style="font-size:13.5px;color:#64748b;margin:12px 0 0">
+        术语：<b>NC</b> 配对成功数 ｜ <b>Np</b> 预测卡数 ｜ <b>Ng</b> 金标卡数 ｜ <b>α</b> 证据像原文的系数</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 流水线 -->
+<section id="pipeline">
+  <h2><span class="num">3</span>技术流水线</h2>
+  <p class="sub">从原始数据到可提交文件，全流程可断点续跑、val 验收制（val 不过线不碰 test）。</p>
+  <div class="flow">
+    <div class="step"><span class="no">①</span><b>数据构造</b><p style="font-size:13.5px;margin:6px 0 0">竞赛数据 → 对话格式（system+user+assistant）</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><span class="no">②</span><b>SFT 微调</b><p style="font-size:13.5px;margin:6px 0 0">LoRA（r16 / r32），completions-only</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><span class="no">③</span><b>vLLM 生成</b><p style="font-size:13.5px;margin:6px 0 0">批量推理，加速 8.7×</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><span class="no">④</span><b>本地评分器</b><p style="font-size:13.5px;margin:6px 0 0">1:1 复刻官方规则</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><span class="no">⑤</span><b>后处理</b><p style="font-size:13.5px;margin:6px 0 0">⑥立场校准 / ⑦截断 / ⑧去重</p></div>
+    <div class="arrow">→</div>
+    <div class="step"><span class="no">⑥</span><b>提交文件</b><p style="font-size:13.5px;margin:6px 0 0">result_final.jsonl（300 条）</p></div>
+  </div>
+  <div class="note" style="margin-top:16px">
+    <b>评分器自检</b>：把标准答案原样提交得 <b>1.0000</b>；把整篇原文当证据提交得 <b>0.7309</b> —— 证明评分逻辑正确，并暴露"证据项"（占判定权重 60%）几乎白送。
+  </div>
+</section>
+
+<!-- 4 实验档案 -->
+<section id="experiments">
+  <h2><span class="num">4</span>实验档案（参数 / 方法 / 原理 / 收益）</h2>
+  <p class="sub">共 12 个实验：<b>4 个有效</b>（绿）、<b>7 个证伪</b>（红）、<b>1 个进行中</b>（黄）。证伪同样是成果——避免了在正式提交上重复试错。</p>
+  <div class="filters">
+    <button class="on" data-f="all">全部</button>
+    <button data-f="ok">✅ 有效</button>
+    <button data-f="no">❌ 证伪</button>
+    <button data-f="run">🔄 进行中</button>
+    <button data-f="info">📐 方法论</button>
+  </div>
+
+  <div class="grid g2" id="expbox">
+
+    <div class="card exp ok" data-k="ok">
+      <h3>E1 · SFT 微调 r16 <span class="badge b-ok">有效</span></h3>
+      <div class="meta">Qwen3-14B + LoRA ｜ 2 epochs ｜ 综合 0.3511 → <b>0.5498</b></div>
+      <div class="kv">
+        <div class="k">参数</div><div class="v">r=16, alpha=32, all-linear, dropout=0.05, lr=1e-4, bs=1×grad_accum 16, max_len=6144, bf16, warmup 5%, 2 epochs</div>
+        <div class="k">方法</div><div class="v">只对 assistant 答案计算 loss（completions-only），并按官方 <code>loss_scale</code> 忽略空 think 块</div>
+        <div class="k">原理</div><div class="v">LoRA 只训练低秩增量、冻结原模型，显存开销小；completions-only 让模型专注学"怎么答"而不是背题面</div>
+        <div class="k">训练</div><div class="v">最终 loss <b>0.515</b>（约 2 小时）</div>
+        <div class="k">收益</div><div class="v gain pos">+0.1987（+57%）—— 本轮最大的单项提升</div>
+      </div>
+    </div>
+
+    <div class="card exp ok" data-k="ok">
+      <h3>E2 · SFT 微调 r32 <span class="badge b-ok">有效（微增）</span></h3>
+      <div class="meta">LoRA 秩加倍 ｜ 2 epochs ｜ 0.5498 → <b>0.5527</b></div>
+      <div class="kv">
+        <div class="k">参数</div><div class="v">r=32, alpha=64（alpha=2r），其余与 E1 完全相同</div>
+        <div class="k">方法</div><div class="v">仅增大 LoRA 容量，验证"容量是否是瓶颈"</div>
+        <div class="k">原理</div><div class="v">r 越大可表达的参数增量越多；但本任务瓶颈在数据/口径，不在容量</div>
+        <div class="k">训练</div><div class="v">最终 loss <b>0.504</b></div>
+        <div class="k">收益</div><div class="v gain pos">+0.0029（+0.5%）—— <b>说明继续加大 r 已饱和</b></div>
+      </div>
+    </div>
+
+    <div class="card exp ok" data-k="ok">
+      <h3>E3 · vLLM 推理加速 <span class="badge b-ok">有效（工程）</span></h3>
+      <div class="meta">HF generate → vLLM 离线批量 ｜ 生成 <b>8.7×</b></div>
+      <div class="kv">
+        <div class="k">参数</div><div class="v">vLLM 独立 venv ｜ bf16 ｜ max_model_len=8192 ｜ gpu_util=0.95 ｜ 启用 LoRA ｜ <code>VLLM_USE_FLASHINFER_SAMPLER=0</code></div>
+        <div class="k">方法</div><div class="v">把逐条 HF 生成替换为 vLLM 离线批量推理，接口与输出格式不变</div>
+        <div class="k">原理</div><div class="v">PagedAttention + 连续批处理，大幅提高显存与算力利用率</div>
+        <div class="k">收益</div><div class="v">val 生成 84 min → <b>9.6 min</b>；综合 0.5527 → <b>0.5538</b>（<b>任务级无损</b>，非逐位一致）</div>
+        <div class="k">坑位</div><div class="v">本机无 nvcc → 必须关 FlashInfer sampler；<code>VLLM::EngineCore</code> 残留进程会占 ~44GB 需显式清理</div>
+      </div>
+    </div>
+
+    <div class="card exp ok" data-k="ok">
+      <h3>E4 · ⑥ 立场 logit 校准 <span class="badge b-ok">有效 ★ 最佳</span></h3>
+      <div class="meta">无标签先验匹配 ｜ 0.5527 → <b>0.5678</b></div>
+      <div class="kv">
+        <div class="k">参数</div><div class="v">b_neutral = <b>+0.7</b>，b_oppose = <b>−0.5</b>（先验分布 L1 = 0.0035）</div>
+        <div class="k">方法</div><div class="v">对每张预测卡做一次前向，取 support/neutral/oppose 的概率；在<b>无标签</b>前提下搜索偏置，使预测立场分布最接近训练集先验分布</div>
+        <div class="k">原理</div><div class="v">立场是第一道<b>硬门槛</b>——立场错，整张卡直接作废。模型天然"中立"偏多，往真实分布上掰一掰，能救回一批卡</div>
+        <div class="k">收益</div><div class="v gain pos">+0.0151（+2.7%）｜ 配对成功数 NC <b>1017 → 1043</b> ｜ F1 0.7182 → 0.7366</div>
+        <div class="k">合规</div><div class="v">无需标签、无泄漏；val 仅用于验收</div>
+      </div>
+    </div>
+
+    <div class="card exp no" data-k="no">
+      <h3>E5 · ⑦ 卡片数 k 扫描截断 <span class="badge b-no">证伪</span></h3>
+      <div class="meta">按置信度排序截断 ｜ 收益 ≤ 0</div>
+      <div class="kv">
+        <div class="k">方法</div><div class="v">用生成时的 log 概率给卡片排序，截断到 k 张（k=3…7）</div>
+        <div class="k">结果</div><div class="v">k≥5 与基线完全相同；k=3 → 0.4387，k=4 → 0.5104（明显变差）</div>
+        <div class="k">原理</div><div class="v">模型本来就只输出 4~5 张卡（Np≈Ng=1421），<b>没有超过 5 张可截断的空间</b></div>
+        <div class="k">收益</div><div class="v gain flat">0 / 负 —— 无操作空间</div>
+      </div>
+    </div>
+
+    <div class="card exp no" data-k="no">
+      <h3>E6 · ⑧ 近重复卡片去重 <span class="badge b-no">证伪</span></h3>
+      <div class="meta">BGE 议题名相似度去重 ｜ 收益 ≤ 0</div>
+      <div class="kv">
+        <div class="k">方法</div><div class="v">议题名 BGE 余弦 &gt; 阈值（0.85 / 0.90 / 0.93 / 0.96）判为重复，保留 logp 更高的</div>
+        <div class="k">结果</div><div class="v">0.5489 / 0.5503 / 0.5503 / 0.5523，<b>全部低于基线 0.5527</b></div>
+        <div class="k">原理</div><div class="v">模型输出的卡片本就几乎没有近重复；去重反而误删有效卡</div>
+        <div class="k">收益</div><div class="v gain flat">负 —— 关闭该方向</div>
+      </div>
+    </div>
+
+    <div class="card exp no" data-k="no">
+      <h3>E7 · Liger 融合核 <span class="badge b-no">证伪</span></h3>
+      <div class="meta">训练速度优化尝试 ｜ 基本无效</div>
+      <div class="kv">
+        <div class="k">方法</div><div class="v">启用 Liger-Kernel 的融合算子，减少显存读写</div>
+        <div class="k">结果</div><div class="v">单步 50.04 s → <b>49.33 s</b>（提升 &lt;2%）</div>
+        <div class="k">原理</div><div class="v">本机是 2 vCPU + HAMi 虚拟 GPU，瓶颈不在算子层</div>
+        <div class="k">收益</div><div class="v gain flat">≈0 —— 不使用</div>
+      </div>
+    </div>
+
+    <div class="card exp no" data-k="no">
+      <h3>E8 · 指令探针 B1 / B2 <span class="badge b-no">证伪</span></h3>
+      <div class="meta">在 prompt 末尾追加指令 ｜ 0.5527 → 0.5498 / 0.5495</div>
+      <div class="kv">
+        <div class="k">方法</div><div class="v">B1：「议题名用简明概括的主题词命名」；B2：「一个议题一张卡」</div>
+        <div class="k">结果</div><div class="v">B1 = 0.5498，B2 = 0.5495，<b>均比基线低 ~0.018</b></div>
+        <div class="k">原理</div><div class="v">SFT 模型是按<b>固定 prompt</b> 训练的；临场加话属于分布外扰动，格式与口径都会漂移</div>
+        <div class="k">收益</div><div class="v gain neg">−0.018 —— 此路不通</div>
+      </div>
+    </div>
+
+    <div class="card exp no" data-k="no">
+      <h3>E9 · SC-merge 自一致性合并 <span class="badge b-no">证伪（关键）</span></h3>
+      <div class="meta">n=5 采样 + 共识投票 ｜ −0.043 ~ −0.088</div>
+      <div class="kv">
+        <div class="k">方法</div><div class="v">T=0.7 每题独立采样 5 次 → 议题名 BGE 聚类（thr 0.65/0.80）→ 频次≥F（2/3）保留 → 众数代表卡（名字/立场/证据/未来）→ rescore+⑥</div>
+        <div class="k">结果</div><div class="v">F2/t80 = 0.5246，F3/t80 = 0.4997，F2/t65 = 0.4796，single-best = 0.5527</div>
+        <div class="k">原理</div><div class="v"><b>模型的口径偏差是系统性的，不是采样噪声</b>——5 次都朝同一方向偏，投票消不掉；频次过滤还误伤了"只被看到 1~2 次"的微妙真议题</div>
+        <div class="k">收益</div><div class="v gain neg">负 —— 但这是全场最有价值的负结果，直接指向"必须重训"</div>
+        <div class="k">成本</div><div class="v">300 篇 × 5 采样 ≈ 25 分钟（vLLM 加速的红利）</div>
+      </div>
+    </div>
+
+    <div class="card exp info" data-k="info">
+      <h3>E10 · 失败归因诊断 <span class="badge b-info">方法论</span></h3>
+      <div class="meta">把"分数不够高"拆成可操作的技术问题</div>
+      <div class="kv">
+        <div class="k">方法</div><div class="v">复刻评分器的匹配逻辑，对 378 张未匹配金标卡逐张归因；统计证据逐字率、议题名与原文的重合度</div>
+        <div class="k">结果</div><div class="v">配对成功但相似度≤0.7：<b>194</b> ｜ 立场无同调卡：<b>101</b> ｜ 相似度不足：64 ｜ 配对挤占：19</div>
+        <div class="k">结果</div><div class="v">近失卡 145 张只差 0.05~0.10 ｜ 近失对 <b>cos(议题名)=0.52</b> vs <b>cos(证据)=0.70</b></div>
+        <div class="k">结论</div><div class="v">短板是<b>议题命名口径</b>与<b>选哪句证据</b>，不是"读不懂"</div>
+        <div class="k">收益</div><div class="v gain pos">决定了后续所有实验的方向</div>
+      </div>
+    </div>
+
+    <div class="card exp run" data-k="run">
+      <h3>E11 · 字段加权重训（Phase 2） <span class="badge b-run">进行中</span></h3>
+      <div class="meta">给短板字段的 loss 加权</div>
+      <div class="kv">
+        <div class="k">方法</div><div class="v">自定义加权交叉熵：议题名 <b>×2</b>、立场 <b>×3</b>、未来论点 <b>×2</b>，其余字段 ×1</div>
+        <div class="k">参数</div><div class="v">r=32, alpha=64, <b>3 epochs</b>（对照：不加权 3 轮）</div>
+        <div class="k">原理</div><div class="v">诊断显示短板集中在"命名口径 / 立场判断 / 未来论点生成"，就<b>让这几处的 loss 权重更大</b>，逼模型学会标准答案的表达习惯</div>
+        <div class="k">工程</div><div class="v">按 token 定位字段值并加权；loss 按 1024 token 分块计算，避免整段 logits 转 fp32 造成显存溢出</div>
+        <div class="k">自检</div><div class="v">加权 token 精确落在议题名/立场上（如 <code>中日青年友好交流</code> / <code>neutral</code>），定位准确率 100%</div>
+      </div>
+    </div>
+
+    <div class="card exp info" data-k="info">
+      <h3>E12 · 训练/推理模式对齐 <span class="badge b-info">基础</span></h3>
+      <div class="meta">复刻官方最佳实践</div>
+      <div class="kv">
+        <div class="k">方法</div><div class="v">训练与推理统一 <code>enable_thinking=False</code>；assistant 轮的空 think 块不参与 loss</div>
+        <div class="k">原理</div><div class="v">对齐官方 <code>loss_scale=ignore_empty_think</code>，避免模型把算力花在"思考标签"上</div>
+        <div class="k">收益</div><div class="v">与其他模型的行为一致，保证对比公平</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 5 主结果 -->
+<section id="results">
+  <h2><span class="num">5</span>主结果（验证集 300 篇）</h2>
+  <p class="sub">所有分数均在 val 上评测；val 未参与训练，是合法的泛化评测。</p>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table>
+      <thead><tr>
+        <th>配置</th><th>引擎</th><th class="n">NC</th><th class="n">Np</th><th class="n">Ng</th>
+        <th class="n">P</th><th class="n">R</th><th class="n">F1</th><th class="n">α</th>
+        <th class="n">抽取<br>(80%)</th><th class="n">ROUGE-L</th><th class="n">BERTScore</th>
+        <th class="n">预测<br>(20%)</th><th class="n">综合</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>基座·零训练</td><td>HF</td><td class="n">767</td><td class="n">1719</td><td class="n">1421</td><td class="n">0.446</td><td class="n">0.540</td><td class="n">0.489</td><td class="n">0.764</td><td class="n">0.373</td><td class="n">0.116</td><td class="n">0.410</td><td class="n">0.263</td><td class="n">0.3511</td></tr>
+        <tr><td>SFT r16（2轮）</td><td>HF</td><td class="n">1007</td><td class="n">1404</td><td class="n">1421</td><td class="n">0.717</td><td class="n">0.709</td><td class="n">0.713</td><td class="n">0.825</td><td class="n">0.588</td><td class="n">0.214</td><td class="n">0.581</td><td class="n">0.398</td><td class="n">0.5498</td></tr>
+        <tr><td>SFT r32（2轮）</td><td>HF</td><td class="n">1017</td><td class="n">1411</td><td class="n">1421</td><td class="n">0.721</td><td class="n">0.716</td><td class="n">0.718</td><td class="n">0.823</td><td class="n">0.591</td><td class="n">0.213</td><td class="n">0.585</td><td class="n">0.399</td><td class="n">0.5527</td></tr>
+        <tr><td>SFT r32（2轮）</td><td>vLLM</td><td class="n">1016</td><td class="n">1402</td><td class="n">1421</td><td class="n">0.725</td><td class="n">0.715</td><td class="n">0.720</td><td class="n">0.823</td><td class="n">0.593</td><td class="n">0.211</td><td class="n">0.585</td><td class="n">0.398</td><td class="n">0.5538</td></tr>
+        <tr><td>SFT r32 ＋ ⑥立场校准（14B 最佳）</td><td>HF</td><td class="n">1043</td><td class="n">1411</td><td class="n">1421</td><td class="n">0.739</td><td class="n">0.734</td><td class="n">0.737</td><td class="n">0.825</td><td class="n">0.608</td><td class="n">0.217</td><td class="n">0.599</td><td class="n">0.408</td><td class="n">0.5678</td></tr>
+        <tr class="best"><td><b>Qwen3-32B</b>（另一台机器）★ 总最佳</td><td>—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">0.771</td><td class="n">0.780</td><td class="n">0.773</td><td class="n">0.849</td><td class="n">0.665</td><td class="n">—</td><td class="n">—</td><td class="n">0.380</td><td class="n">0.6082</td></tr>
+        <tr style="color:#64748b"><td>参照上界·答案照抄</td><td>—</td><td class="n">1421</td><td class="n">1421</td><td class="n">1421</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.0000</td></tr>
+        <tr style="color:#64748b"><td>参照·整篇原文当证据</td><td>—</td><td class="n">1393</td><td class="n">1421</td><td class="n">1421</td><td class="n">0.980</td><td class="n">0.980</td><td class="n">0.980</td><td class="n">0.677</td><td class="n">0.664</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">1.000</td><td class="n">0.7309</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note green" style="margin-top:16px">
+    <b>32B 结果已到（总最佳 0.6082）</b>：extract 0.665、future 0.380。基座升级对<b>抽取</b>帮助巨大（+0.057），
+    但<b style="color:var(--red)">未来论点反而退步</b>（0.408 → 0.380），是 32B 当前最大短板。
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <b>收益瀑布</b>
+    <div class="waterfall">
+      <div class="wf"><div class="stack"><div class="seg" style="height:35.11%;background:#cdd7e6;color:#33415c">0.3511</div></div><div class="lbl">基座</div></div>
+      <div class="wf"><div class="stack"><div class="seg" style="height:19.87%;background:var(--green)">+0.1987</div></div><div class="lbl">r16 微调</div></div>
+      <div class="wf"><div class="stack"><div class="seg" style="height:0.29%;background:#7ee2a8;min-height:16px">+0.003</div></div><div class="lbl">r32</div></div>
+      <div class="wf"><div class="stack"><div class="seg" style="height:0.11%;background:#7ee2a8;min-height:16px">+0.001</div></div><div class="lbl">vLLM</div></div>
+      <div class="wf"><div class="stack"><div class="seg" style="height:1.4%;background:var(--blue);min-height:16px">+0.014</div></div><div class="lbl">⑥ 立场校准</div></div>
+      <div class="wf"><div class="stack"><div class="seg" style="height:56.78%;background:linear-gradient(180deg,#2563eb,#0b1220)">0.5678</div></div><div class="lbl">当前最佳</div></div>
+    </div>
+    <p style="font-size:13.5px;color:#64748b;margin:4px 0 0">柱高按综合分绝对值绘制；可见 <b>微调贡献了绝大多数提升</b>，后处理中只有 ⑥ 立场校准有效。</p>
+  </div>
+</section>
+
+<!-- 6 案例 -->
+<section id="cases">
+  <h2><span class="num">6</span>真实案例</h2>
+  <p class="sub">以下全部来自 val 集的真实预测，可直接用于讲解。</p>
+
+  <div class="grid g3" style="margin-bottom:16px">
+    <div class="card"><b>证据逐字率</b>
+      <p style="font-size:14px;margin:8px 0 4px">金标：<b style="color:var(--green)">100%</b> ｜ 模型：<b style="color:var(--blue)">99.18%</b></p>
+      <p style="font-size:13.5px;color:#64748b;margin:0">模型早已学会"逐字摘抄原文"，原计划的"强制照抄"没有价值。</p></div>
+    <div class="card"><b>未来论点的性质</b>
+      <p style="font-size:14px;margin:8px 0 4px">金标逐字率：<b style="color:var(--red)">0%</b>（纯生成）</p>
+      <p style="font-size:13.5px;color:#64748b;margin:0">"未来表态"不可能从原文抄，只能靠训练生成——所以走重训路线。</p></div>
+    <div class="card"><b>议题名的口径</b>
+      <p style="font-size:14px;margin:8px 0 4px">原文子串率：金标 <b>13.7%</b> vs 模型 <b>23.7%</b></p>
+      <p style="font-size:13.5px;color:#64748b;margin:0">金标更"抽象概括"，模型更"贴原文"——这就是命名对不上的根因。</p></div>
+  </div>
+
+  <div class="card">
+    <b>案例一 · 内容读对了，标题起错了</b>
+    <p style="font-size:14px;color:#475569;margin:6px 0 14px">下面三组来自不同文档：模型和标准答案指向的是同一件事，但议题名相似度很低（占判定权重 40%）。</p>
+    <table>
+      <thead><tr><th>同一个意思</th><th>模型起的名字</th><th>标准答案的名字</th><th class="n">名字相似度</th><th class="n">证据相似度</th></tr></thead>
+      <tbody>
+        <tr><td>美国 DART 撞小行星试验</td><td><span class="tag t-pred">模型</span>DART任务验证偏转</td><td><span class="tag t-gold">金标</span>动能撞击偏转技术</td><td class="n">0.48</td><td class="n">0.82</td></tr>
+        <tr><td>亚太合作不要脱钩</td><td><span class="tag t-pred">模型</span>APEC开放区域主义</td><td><span class="tag t-gold">金标</span>反对脱钩断链</td><td class="n" style="color:var(--red);font-weight:700">0.26</td><td class="n">0.97</td></tr>
+        <tr><td>边境联合巡逻</td><td><span class="tag t-pred">模型</span>过境口岸升级</td><td><span class="tag t-gold">金标</span>联合巡逻机制</td><td class="n">0.34</td><td class="n">0.83</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="margin-top:14px">
+      判分公式 = <code>0.4×议题名 + 0.6×证据</code>。以第二行为例：0.4×0.26 + 0.6×0.97 = <b>0.686 &lt; 0.7</b> —— 只差一点点，被判定为"没答对"。<b>内容全对，名字害的。</b>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <b>案例二 · 证据是"同一句话"，只是截取不同</b>
+    <div class="grid g2" style="margin-top:12px">
+      <div class="ex"><span class="tag t-pred">模型证据</span><div class="a">双方在联合巡逻机制和过境口岸升级方面取得初步共识</div></div>
+      <div class="ex"><span class="tag t-gold">金标证据</span><div class="a">据会谈公报显示，双方在联合巡逻机制和过境口岸升级方面取得初步共识</div></div>
+    </div>
+    <p style="font-size:13.5px;color:#64748b;margin:12px 0 0">金标只是多了个前缀。说明模型<b>已经找对了句子</b>，差距在"从哪开始截"这种细节上。</p>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <b>案例三 · 未匹配卡片的归因分布</b>
+    <p style="font-size:14px;color:#475569;margin:6px 0 12px">378 张"没得分"的金标卡，逐张查原因：</p>
+    <table>
+      <thead><tr><th>原因</th><th class="n">数量</th><th>含义</th></tr></thead>
+      <tbody>
+        <tr><td>配上了对，但相似度 ≤ 0.7</td><td class="n"><b>194</b></td><td>议题找对了，名字/证据不够像</td></tr>
+        <tr><td>没有同立场的预测卡</td><td class="n">101</td><td>被"立场硬门槛"直接卡死</td></tr>
+        <tr><td>最佳候选相似度 ≤ 0.7</td><td class="n">64</td><td>有同立场候选，但都不够像</td></tr>
+        <tr><td>被其他卡片抢走配对</td><td class="n">19</td><td>一对一匹配的挤占</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:13.5px;color:#64748b;margin:12px 0 0">
+      另有 <b>145 张只差 0.05~0.10</b> 就能过线 —— 这解释了为什么"命名口径"和"立场校准"是最有价值的方向。</p>
+  </div>
+</section>
+
+<!-- 7 发现 -->
+<section id="findings">
+  <h2><span class="num">7</span>三个关键发现</h2>
+  <div class="grid g3">
+    <div class="card exp info">
+      <h3>① 不是"读不懂",是"起名口径"不同</h3>
+      <p style="font-size:14px">标准答案偏概括性主题词，模型偏爱照抄原文。意思对了，名字对不上，40% 的判定权重白白流失。</p>
+    </div>
+    <div class="card exp info">
+      <h3>② 证据早已"逐字抄"（99.2%）</h3>
+      <p style="font-size:14px">原计划教它"照抄原文"，一查发现它早会了。真正的问题是<b>内容里那么多句子，它选了哪一句</b>。</p>
+    </div>
+    <div class="card exp info">
+      <h3>③ 错误是"系统性"的,不是"随机"的</h3>
+      <p style="font-size:14px">同一篇文章让它答 5 遍投票，结果<b>更差</b>（−0.043）。因为每次都往同一方向偏——投票救不了系统偏差，只能靠重训。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 下一步 -->
+<section id="next">
+  <h2><span class="num">8</span>下一步</h2>
+  <div class="grid g2">
+    <div class="card">
+      <span class="badge b-run">进行中</span>
+      <h3 style="margin:8px 0 4px">字段加权重训（E11）</h3>
+      <p style="font-size:14px;color:#475569;margin:0">对议题名（×2）、立场（×3）、未来论点（×2）加权，3 轮训练；同步跑不加权对照，干净归因"加权是否有效"。</p>
+    </div>
+    <div class="card">
+      <span class="badge b-info">计划</span>
+      <h3 style="margin:8px 0 4px">正式上 Qwen3-32B</h3>
+      <p style="font-size:14px;color:#475569;margin:0">合规要求基座必须为 32B。把 14B 上验证过的方法论（含有效/无效清单）整体平移，避免重复试错。</p>
+    </div>
+    <div class="card">
+      <span class="badge b-info">储备</span>
+      <h3 style="margin:8px 0 4px">证据选句质量</h3>
+      <p style="font-size:14px;color:#475569;margin:0">诊断显示证据"选哪句"是关键。可探索基于原文片段的约束式选句，锁住 60% 的证据判定权重。</p>
+    </div>
+    <div class="card">
+      <span class="badge b-info">储备</span>
+      <h3 style="margin:8px 0 4px">未来论点生成</h3>
+      <p style="font-size:14px;color:#475569;margin:0">占 20% 权重、当前 ROUGE-L 仅 0.21，是最大的单点短板；随 E11 的字段加权一并优化。</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  谈判观点挖掘 · 项目成果演示 ｜ 数据截至 2026-10-02 ｜ 所有分数均为 val（300 篇）评测 ｜ 单文件离线网页
+</footer>
+
+<script>
+document.querySelectorAll('.filters button').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.filters button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    var f = b.getAttribute('data-f');
+    document.querySelectorAll('#expbox > .card').forEach(function(c){
+      c.style.display = (f === 'all' || c.getAttribute('data-k') === f) ? '' : 'none';
+    });
+  });
+});
+</script>
+</body>
+</html>
