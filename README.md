@@ -133,6 +133,7 @@ postprocess.py(⑥⑦⑧)   fit_bias.py + apply_stance_calib.py   sc_merge.py
 │   ├── sc_merge.py          #   自一致性合并
 │   ├── diag_phase0.py       #   失败归因诊断
 │   ├── analyze_names.py     #   议题命名口径分析
+│   ├── export_pred.py       #   模型逐条输出 → 可读 CSV/JSON（含金标对照与失败原因）
 │   ├── ms_dl.py             #   ModelScope 断点续传下载
 │   └── pipeline.py          #   无人值守主流水线
 ├── scripts/                 # 编排 / 部署脚本
