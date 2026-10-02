@@ -1,0 +1,21 @@
+{
+  "time": "2026-10-03T07:26:02+0800",
+  "jobs": {
+    "S01_baseline": {
+      "train": {
+        "status": "running",
+        "progress": {
+          "step": 30,
+          "total": 40,
+          "timing": "40:18<13:27, 80.74s/it"
+        }
+      }
+    }
+  },
+  "scores": {},
+  "alerts": [],
+  "gpu": "0, 22115 MiB, 100 %\n1, 15 MiB, 0 %",
+  "queue_alive": true,
+  "maintenance": false,
+  "published_at": "2026-10-02T23:26:05.363149+00:00"
+}
