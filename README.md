@@ -82,6 +82,9 @@ postprocess.py(⑥⑦⑧)   fit_bias.py + apply_stance_calib.py   sc_merge.py
 
 ## 实验记录
 
+> 📒 **完整实验日志（含全部参数、结论与证伪原因）：[`docs/EXPERIMENTS.md`](docs/EXPERIMENTS.md)**
+> 新实验请先用 [实验提案模板](.github/ISSUE_TEMPLATE/experiment_proposal.md) 开 Issue，完成后用 [实验记录模板](.github/ISSUE_TEMPLATE/experiment_log.md) 归档。
+
 ### ✅ 有效
 | 实验 | 说明 | 收益 |
 |---|---|---|
@@ -211,6 +214,15 @@ P = NC/Np    R = NC/Ng    F1 = 2PR/(P+R)
 ```
 
 > 自检：把标准答案原样提交得 **1.0000**；把整篇原文当证据得 **0.7309**。
+
+---
+
+## 协作 / 贡献
+
+- **实验提案**：用 [`实验提案模板`](.github/ISSUE_TEMPLATE/experiment_proposal.md) 开 Issue（含唯一变量、对照组、验收标准）。
+- **实验归档**：完成后用 [`实验记录模板`](.github/ISSUE_TEMPLATE/experiment_log.md) 记录，并把结论补进 [`docs/EXPERIMENTS.md`](docs/EXPERIMENTS.md)。
+- **缺陷 / 建议**：用 Bug 报告或功能建议模板。
+- **铁律**：**任何改动先在 val（300 条）验收，通过才应用于 test**；一次只改一个变量。
 
 ---
 

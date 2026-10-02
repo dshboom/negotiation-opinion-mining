@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 实验日志（已完成的实验）
+    url: https://github.com/dshboom/negotiation-opinion-mining/blob/main/docs/EXPERIMENTS.md
+    about: 先看看某个方向是不是已经试过/证伪过，避免重复踩坑
