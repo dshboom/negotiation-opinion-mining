@@ -1,338 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>谈判观点挖掘 · 项目进度</title>
-<style>
-  :root{--bg:#f5f8fc;--card:#fff;--ink:#0f172a;--muted:#5b6b82;--line:#e2e9f3;
-        --blue:#2563eb;--green:#15a34a;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;
-        --gs:#e6f6ec;--rs:#fdeaea;--as:#fdf3e3;--bs:#e8efff;--ps:#f1eaff;}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.75;
-       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-  .wrap{max-width:1100px;margin:0 auto;padding:0 18px 70px}
-  header{background:linear-gradient(135deg,#0b1220,#122a52 55%,#1d4ed8 135%);color:#fff;
-         padding:34px 0 28px;margin-bottom:26px}
-  header .in{max-width:1100px;margin:0 auto;padding:0 18px;display:flex;flex-wrap:wrap;gap:22px;
-             align-items:flex-end;justify-content:space-between}
-  h1{margin:0;font-size:29px}
-  .sub{color:#cfe0ff;font-size:14px;margin-top:4px}
-  .big{text-align:right}
-  .big b{font-size:40px;line-height:1;display:block}
-  .big span{font-size:12.5px;color:#bcd3ff}
-  .updated{font-size:12.5px;color:#9fb6dd;margin-top:8px}
-  h2{font-size:21px;margin:30px 0 4px}
-  h2 .n{display:inline-block;background:var(--blue);color:#fff;border-radius:8px;font-size:13px;padding:1px 9px;margin-right:9px;vertical-align:2px}
-  .sub2{color:var(--muted);font-size:13.5px;margin:0 0 14px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
-  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-  @media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}.in{flex-direction:column;align-items:flex-start}.big{text-align:left}}
-  .kpi b{display:block;font-size:23px;line-height:1.3}
-  .kpi span{font-size:12.5px;color:var(--muted)}
-  .ph{display:flex;flex-direction:column;gap:12px}
-  .phase{display:grid;grid-template-columns:1fr 130px;gap:10px 14px;align-items:center}
-  .phase .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
-  .pill{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 10px}
-  .p-done{background:var(--gs);color:var(--green)} .p-doing{background:var(--as);color:var(--amber)}
-  .p-pending{background:#eef2f7;color:#64748b}
-  .bar{height:9px;background:#eef2f7;border-radius:6px;overflow:hidden;margin-top:6px}
-  .bar>i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#2563eb,#60a5fa)}
-  .phase .detail{font-size:13px;color:var(--muted)}
-  .phase .pct{font-size:13px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
-  table{width:100%;border-collapse:collapse;font-size:13.5px}
-  th,td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:left}
-  th{background:#f1f6fd;color:#33415c;font-size:12.6px;font-weight:700}
-  td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-  tr.best td{background:#f0fdf4;font-weight:700}
-  .mark{font-size:11px;border-radius:6px;padding:1px 7px;background:var(--bs);color:var(--blue)}
-  .mark.probe{background:#eef2f7;color:#64748b}
-  .filters{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
-  .filters button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;color:#42506a}
-  .filters button.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
-  .exps{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-  @media(max-width:860px){.exps{grid-template-columns:1fr}}
-  .exp{border-left:5px solid var(--line);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
-  .exp.ok{border-left-color:var(--green)} .exp.no{border-left-color:var(--red)}
-  .exp.run{border-left-color:var(--amber)} .exp.info{border-left-color:var(--blue)}
-  .exp h3{margin:0 0 4px;font-size:15.5px}
-  .exp .g{font-weight:800}
-  .g.pos{color:var(--green)} .g.neg{color:var(--red)} .g.flat{color:var(--muted)} .g.run{color:var(--amber)}
-  .exp .m{font-size:12.6px;color:var(--muted);margin-top:5px}
-  .exp .w{font-size:12.8px;color:#475569;margin-top:5px}
-  .grid2{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  @media(max-width:860px){.grid2{grid-template-columns:1fr}}
-  .todos{display:flex;flex-direction:column;gap:8px}
-  .todo{display:flex;gap:10px;align-items:center;font-size:14px}
-  .links{display:flex;flex-wrap:wrap;gap:9px}
-  .links a{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:13.5px}
-  .links a:hover{border-color:var(--blue)}
-  .foot{color:var(--muted);font-size:12.5px;text-align:center;margin-top:36px;border-top:1px solid var(--line);padding-top:16px}
-  .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 13px;font-size:13px;cursor:pointer}
-  .banner{background:#fffbf0;border:1px solid #f2e2bc;color:#7a5b12;border-radius:11px;padding:11px 14px;font-size:13.5px;margin-bottom:14px}
-  .ds{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
-  .ds .hd{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
-  .ds h3{margin:0;font-size:17px}
-  .ds .badges{display:flex;flex-wrap:wrap;gap:6px}
-  .badge{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--bs);color:var(--blue)}
-  .badge.ph{background:var(--ps);color:var(--purple)}
-  .ds .d{font-size:13.4px;color:#475569;margin:8px 0 4px}
-  .charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin:10px 0 4px}
-  .chart{background:#f8fbff;border:1px solid var(--line);border-radius:11px;padding:11px 13px}
-  .chart .ct{font-size:12.8px;font-weight:700;color:#33415c;margin-bottom:8px}
-  .bar-row{margin-bottom:8px;font-size:12.6px}
-  .bar-row .lbl{display:flex;justify-content:space-between;gap:8px;color:#475569;margin-bottom:3px}
-  .bar-row .lbl b{font-variant-numeric:tabular-nums;color:var(--ink)}
-  .bar-track{height:8px;background:#e8eef7;border-radius:5px;overflow:hidden}
-  .bar-track>i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#2563eb,#60a5fa)}
-  .bar-row.hot .bar-track>i{background:linear-gradient(90deg,#15a34a,#4ade80)}
-  .tblwrap{overflow-x:auto;margin-top:10px}
-  details.tbl{margin-top:8px}
-  details.tbl summary{cursor:pointer;font-size:13px;color:var(--blue);user-select:none}
-  .ds .dl{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;align-items:center}
-  .ds .dl a{background:#fff;border:1px solid var(--line);border-radius:9px;padding:6px 12px;font-size:12.8px;font-weight:700;text-decoration:none}
-  .ds .dl a.json{color:#0b6b3a;border-color:#bfe3cd}
-  .ds .dl a.csv{color:#7a3d0b;border-color:#e8d3b0}
-  .ds .dl a:hover{background:#f8fbff}
-  .ds .raw{font-size:12px;color:var(--muted);flex:1 1 260px}
-</style>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="谈判观点挖掘研究工作台：Qwen3训练实验、可信成绩、研究方法和公开数据。">
+  <title>谈判观点挖掘｜研究工作台</title>
+  <link rel="stylesheet" href="assets/workbench.css">
+  <script src="assets/workbench.js" defer></script>
 </head>
 <body>
-<header><div class="in">
-  <div>
-    <h1 id="proj">谈判观点挖掘</h1>
-    <div class="sub" id="subtitle">加载中 …</div>
-  </div>
-  <div class="big">
-    <b id="best">—</b><span id="bestlabel"></span>
-    <div class="updated">最后更新：<span id="updated">—</span></div>
-  </div>
-</div></header>
-
-<div class="wrap">
-  <div id="err" class="banner" style="display:none"></div>
-
-  <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">
-    <button class="btn" onclick="load(true)">🔄 立即刷新</button>
-    <button class="btn" id="autobtn" onclick="toggleAuto()">⏱ 自动刷新：开</button>
-  </div>
-
-  <h2><span class="n">1</span>关键指标</h2>
-  <div class="kpis" id="kpis"></div>
-
-  <h2><span class="n">2</span>当前进度</h2>
-  <p class="sub2">进度数据来自 <code>docs/data/progress.json</code>，更新该文件即可刷新本页。</p>
-  <div class="card ph" id="phases"></div>
-
-  <h2><span class="n">3</span>主结果（val 300）</h2>
-  <p class="sub2">综合分 = 0.8 × (F1 × α) + 0.2 × 预测得分</p>
-  <div class="card" style="padding:0;overflow-x:auto">
-    <table><thead><tr>
-      <th>配置</th><th>引擎</th><th class="n">F1</th><th class="n">α</th>
-      <th class="n">抽取(80%)</th><th class="n">未来(20%)</th><th class="n">综合</th><th>备注</th>
-    </tr></thead><tbody id="results"></tbody></table>
-  </div>
-
-  <h2><span class="n">4</span>结果文件 · 可视化与下载</h2>
-  <p class="sub2">每个数据集都标注了归属实验（E 编号）。展开可看明细表，点「下载 JSON / CSV」获取原始文件。数据由 <code>docs/data/results/datasets.json</code> 生成。</p>
-  <div id="datasets"></div>
-
-  <h2><span class="n">5</span>实验看板</h2>
-  <p class="sub2">有效与证伪同等重要——证伪清单能避免重复踩坑。</p>
-  <div class="filters" id="filters">
-    <button class="on" data-f="all">全部</button>
-    <button data-f="ok">✅ 有效</button>
-    <button data-f="no">❌ 证伪</button>
-    <button data-f="run">🔄 进行中</button>
-    <button data-f="info">📐 方法论</button>
-  </div>
-  <div class="exps" id="exps"></div>
-
-  <h2><span class="n">6</span>关键发现</h2>
-  <div class="grid2" id="findings"></div>
-
-  <h2><span class="n">7</span>待办 / 下一步</h2>
-  <div class="card todos" id="todos"></div>
-
-  <h2><span class="n">8</span>相关链接</h2>
-  <div class="links" id="links"></div>
-
-  <div class="foot">
-    <span id="footproj">谈判观点挖掘</span> · GitHub Pages ｜ 页面渲染时间：<span id="rendered">—</span>
-  </div>
+<a class="skip" href="#main">跳到主要内容</a>
+<aside class="sidebar">
+  <a class="brand" href="#overview"><span class="brand-mark" aria-hidden="true">观</span><span>谈判观点挖掘<small>训练与评测研究工作台</small></span></a>
+  <nav aria-label="主要导航">
+    <a href="#overview" data-page="overview">研究总览 <span>现状与路线</span></a>
+    <a href="#experiments" data-page="experiments">实验中心 <span>配置与结论</span></a>
+    <a href="#results" data-page="results">结果分析 <span>成绩与对照</span></a>
+    <a href="#methods" data-page="methods">研究方法 <span>监督与偏好</span></a>
+    <a href="#datasets" data-page="datasets">资料与下载 <span>数据与汇报</span></a>
+  </nav>
+  <div class="sidebar-foot"><span class="dot"></span>公开研究记录<br><a href="https://github.com/dshboom/negotiation-opinion-mining">查看 GitHub 仓库</a><p>只公开聚合信息。<br>原始预测与金标不在本站发布。</p></div>
+</aside>
+<div class="workspace">
+  <header class="topbar"><span>Qwen3 · 长文观点抽取与未来表态</span><button id="refresh" type="button">刷新数据</button></header>
+  <main id="main" tabindex="-1">
+    <div id="notice" role="status" class="notice">正在读取研究数据…</div>
+    <section id="overview" class="page" aria-labelledby="overview-title">
+      <div class="page-heading"><div><h1 id="overview-title">让每一次训练，<br>都有可验证的答案。</h1><p>从原文证据到观点卡，再到未来表态。记录方法为何改变，实验走到哪里，以及分数是否真的提高。</p></div><div class="snapshot" id="snapshot"></div></div>
+      <div class="route-board"><div class="section-head"><h2>当前研究路线</h2><span>只保留实测有效的模块</span></div><div class="route"><div><span class="route-state">已有参照</span><h3>联合 SFT 基线</h3><p>原文一次生成观点卡与未来论点</p></div><div class="route-bridge" aria-hidden="true">→</div><div class="route-focus"><span class="route-state">本轮主线</span><h3>结构化监督</h3><p>证据先行抽取<br>逐卡独立生成未来表态</p></div><div class="route-bridge" aria-hidden="true">→</div><div><span class="route-state">待构造</span><h3>真实偏好答案对</h3><p>仅用训练内留出预测<br>筛选可靠的质量差距</p></div><div class="route-bridge" aria-hidden="true">→</div><div><span class="route-state">待验证</span><h3>DPO / RFT</h3><p>分模块优化<br>完整 val 评分决定去留</p></div></div><div class="route-caption">目标是正式综合分提升，不是必须完成某种算法。训练完成 ≠ 评测通过 ≠ 已经涨分。</div></div>
+      <div id="summary" class="summary-strip"></div>
+      <div class="section-head"><h2>两条实验线，分别追踪</h2><a href="#experiments">查看全部实验</a></div>
+      <div class="lanes"><article class="lane"><header><h3>L20 · 结构化训练</h3><span class="badge">核验快照</span></header><div id="l20-phases"></div><a href="https://github.com/dshboom/negotiation-opinion-mining/blob/main/docs/STRUCTURE_RUN_STATUS.md">阅读动机与详细进度</a></article><article class="lane"><header><h3>双 3090 · 独立试验</h3><span class="badge">独立数据源</span></header><div id="dual-status"></div><a href="dual3090.html">打开原始监控页</a> <a href="https://github.com/dshboom/negotiation-opinion-mining/blob/main/docs/DUAL3090_PROGRESS.md">研究记录</a></article></div>
+      <div class="section-head"><h2>为什么改变训练方法</h2></div><div class="insights"><article><h3>把算力用在主要得分项</h3><p>综合分的80%来自抽取。先改善议题、证据选择与立场，再检验未来模块能否独立获益。</p></article><article><h3>更可靠的对照，而不是更多参数</h3><p>联合与结构化SFT使用同一2000条fit。只有控制数据量，才知道收益来自任务结构还是额外训练。</p></article><article><h3>负结果也是研究资产</h3><p>截断、去重、追加提示与多数投票在已试配置下无收益。新路线针对系统性偏差，而不是重复后处理。</p></article></div><div id="findings"></div>
+    </section>
+    <section id="experiments" class="page" hidden aria-labelledby="experiments-title"><div class="page-heading"><div><h1 id="experiments-title">实验中心</h1><p>方法、参数和结果一起看。历史记录与当前训练严格区分。</p></div></div><div class="toolbar"><label>搜索实验<input id="search" type="search" placeholder="编号、方法、参数或结论"></label><label>状态<select id="exp-status"><option value="all">全部状态</option><option value="run">进行中</option><option value="ok">有效 / 已完成</option><option value="no">无收益</option><option value="info">诊断 / 未验收</option></select></label></div><p id="exp-count" class="muted"></p><div id="experiment-list"></div></section>
+    <section id="results" class="page" hidden aria-labelledby="results-title"><div class="page-heading"><div><h1 id="results-title">分数背后的变化</h1><p>正式预测、历史报告与诊断上限分开呈现。新结构模型没有评分前，不进入成绩榜。</p></div></div><div class="callout">32B历史报告中的 F1 × α 与抽取分存在不一致，原始报告仍待核验；oracle结果只用于诊断，不代表可提交的模型成绩。</div><div class="toolbar"><label>比较指标<select id="metric"><option value="composite">综合分</option><option value="extract">抽取分（80%）</option><option value="future">未来分（20%）</option><option value="f1">抽取 F1</option></select></label></div><div id="score-chart" class="chart" aria-label="成绩比较"></div><div class="section-head"><h2>完整指标与归属</h2><span>val 300 · 不跨 split 比较</span></div><div id="score-table" class="table-wrap"></div><div class="section-head"><h2>评分怎样组成</h2></div><div class="formula"><strong>综合 = 0.8 × 抽取 + 0.2 × 未来</strong><p>抽取 = F1 × α　　未来 = (ROUGE-L + BERTScore) / 2</p><p>匹配要求立场一致，议题与证据的加权语义相似度超过阈值，并执行一对一匹配。只看F1或训练loss不足以判断最终收益。</p></div></section>
+    <section id="methods" class="page" hidden aria-labelledby="methods-title"><div class="page-heading"><div><h1 id="methods-title">训练方法与证据链</h1><p>每一个设计都有假设、对照和停止条件。方法创新最终要回到比赛评分。</p></div></div><div class="method-layout"><article><h2>把联合任务拆开</h2><div class="task-example"><span>输入</span><p>外交 / 时政长文</p><span>抽取适配器</span><p>argument_chain → issue_name → stance</p><span>未来适配器</span><p>原文 + 预测议题卡 → 未来表态</p><span>输出</span><p>issue_list 与 future_argument 一一对应</p></div><p>先输出证据是可检验的监督设计，不等于模型已经学会更好的推理。正式验收必须输入预测卡，不能使用val金标卡生成未来答案。</p></article><article><h2>训练内的数据边界</h2><div class="split"><div style="flex:5">2000 fit<small>初始 SFT</small></div><div style="flex:1">300 source<small>偏好来源</small></div><div style="flex:1">100 dev<small>偏好确认</small></div></div><ul><li>2400条训练样本对应2354组不同原文，完全相同原文整组划分。</li><li>fit/holdout与train/val无完全重复原文；近重复检查尚未完成。</li><li>偏好来源进入DPO后即为训练数据，不再是测试集。</li><li>val只做系统验收；test不参与训练和方法选择。</li></ul></article></div><div class="section-head"><h2>SFT之后，为什么不直接上DPO</h2></div><div class="table-wrap"><table><thead><tr><th>方法</th><th>监督信号</th><th>适用假设</th><th>当前状态</th></tr></thead><tbody><tr><td>结构化 SFT</td><td>证据先行答案；逐卡未来标签</td><td>任务拆分减少输出干扰</td><td>抽取完成，其他模块接续</td></tr><tr><td>预测卡增强 SFT</td><td>真实预测卡对应的未来标签</td><td>缓解金标卡与预测卡的分布差异</td><td>待验证与实现</td></tr><tr><td>RFT</td><td>真实候选中的可靠高质量正例</td><td>抽取硬约束适合稳定正例学习</td><td>候选方法，未启动</td></tr><tr><td>DPO</td><td>同一提示下真实chosen/rejected对</td><td>可靠相对偏好改善模型决策</td><td>偏好数据质检后决定</td></tr></tbody></table></div><h2>进入下一阶段的条件</h2><div class="insights"><article><h3>先检查链路</h3><p>最长样本、监督mask、解析、卡片对应和恢复状态通过；不静默删样本。</p></article><article><h3>再检查偏好标签</h3><p>同提示、真实候选、明确差距；检查重复、格式负例比例与长度偏置。</p></article><article><h3>最后检查真实收益</h3><p>固定SFT参考模型，对比DPO和RFT；分模块验收，只组合有效模块。</p></article></div><a href="https://github.com/dshboom/negotiation-opinion-mining/blob/main/docs/STRUCTURE_RUN_STATUS.md">查看完整研究说明</a></section>
+    <section id="datasets" class="page" hidden aria-labelledby="datasets-title"><div class="page-heading"><div><h1 id="datasets-title">研究资料与数据</h1><p>公开聚合结果支持在线查看与下载。原始逐条预测和金标保持私有。</p></div></div><div class="resource-links"><a href="demo_detailed.html">详细汇报演示<span>研究背景、指标与诊断</span></a><a href="demo_overview.html">精简演示<span>分享与快速介绍</span></a><a href="https://github.com/dshboom/negotiation-opinion-mining/blob/main/docs/EXPERIMENTS.md">完整实验日志<span>参数、结论与负结果</span></a><a href="https://github.com/dshboom/negotiation-opinion-mining/blob/main/docs/presentation_script_zh.md">中文演讲稿<span>汇报讲解材料</span></a></div><div class="toolbar"><label>选择公开数据集<select id="dataset-select"></select></label></div><div id="dataset-view"></div></section>
+  </main><footer>谈判观点挖掘研究工作台 <span>公开聚合数据 · 可追溯实验 · 不将计划当作成果</span><p id="fetch-time"></p></footer>
 </div>
-
-<script>
-const DATA_URL = './data/progress.json';
-const STATUS = { done:['已完成','p-done'], doing:['进行中','p-doing'], pending:['待开始','p-pending'] };
-const EXP = { ok:['✅ 有效','b-ok'], no:['❌ 证伪','b-no'], run:['🔄 进行中','b-run'], info:['📐 方法论','b-info'] };
-let DATA = null, auto = true, timer = null;
-
-function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function num(x){ return (typeof x === 'number') ? x.toFixed(4) : esc(x); }
-
-async function load(manual){
-  try{
-    const r = await fetch(DATA_URL + '?t=' + Date.now(), {cache:'no-store'});
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    DATA = await r.json();
-    document.getElementById('err').style.display = 'none';
-    render();
-  }catch(e){
-    const el = document.getElementById('err');
-    el.style.display = 'block';
-    el.innerHTML = '⚠️ 数据加载失败（' + esc(e.message) + '）。若你用 file:// 直接打开，浏览器会拦截 fetch——请通过 GitHub Pages 访问，或本地起一个静态服务器。';
-  }
-}
-
-function render(){
-  const d = DATA;
-  document.getElementById('proj').textContent = d.project || '';
-  document.getElementById('subtitle').textContent = d.subtitle || '';
-  document.getElementById('best').textContent = d.best || '';
-  document.getElementById('bestlabel').textContent = d.best_label || '';
-  document.getElementById('updated').textContent = d.updated || '';
-  document.getElementById('footproj').textContent = d.project || '';
-  document.getElementById('rendered').textContent = new Date().toLocaleString('zh-CN');
-
-  document.getElementById('kpis').innerHTML = (d.kpis||[]).map(k =>
-    `<div class="card kpi"><b>${esc(k.value)}</b><span>${esc(k.label)}</span></div>`).join('');
-
-  document.getElementById('phases').innerHTML = (d.phases||[]).map(p => {
-    const st = STATUS[p.status] || ['—','p-pending'];
-    const pct = Math.max(0, Math.min(100, p.progress||0));
-    return `<div class="phase">
-      <div>
-        <div class="top"><b>${esc(p.name)}</b><span class="pill ${st[1]}">${st[0]}</span></div>
-        <div class="bar"><i style="width:${pct}%"></i></div>
-        <div class="detail">${esc(p.detail||'')}</div>
-      </div>
-      <div class="pct">${pct}%</div>
-    </div>`;
-  }).join('');
-
-  const bestComp = Math.max(...(d.results||[]).map(r => r.composite));
-  document.getElementById('results').innerHTML = (d.results||[]).map(r => {
-    const cls = (r.composite === bestComp) ? ' class="best"' : '';
-    const mk = r.mark ? `<span class="mark ${/探针|参照/.test(r.name)?'probe':''}">${esc(r.mark)}</span>` : '';
-    return `<tr${cls}><td>${esc(r.name)}</td><td>${esc(r.engine)}</td>
-      <td class="n">${num(r.f1)}</td><td class="n">${num(r.alpha)}</td>
-      <td class="n">${num(r.extract)}</td><td class="n">${num(r.future)}</td>
-      <td class="n">${num(r.composite)}</td><td>${mk}</td></tr>`;
-  }).join('');
-
-  document.getElementById('exps').innerHTML = (d.experiments||[]).map(x => {
-    const st = EXP[x.status] || ['—','b-gray'];
-    const gcls = /^\+/.test(x.gain) ? 'pos' : (/^[−-]/.test(x.gain) ? 'neg' : (/待评/.test(x.gain) ? 'run' : 'flat'));
-    return `<div class="exp ${x.status}" data-k="${x.status}">
-      <h3>${esc(x.id)} · ${esc(x.name)} <span class="pill ${st[1]}">${st[0]}</span></h3>
-      <div class="g ${gcls}">收益：${esc(x.gain)}</div>
-      <div class="m">参数：${esc(x.params)}</div>
-      <div class="w">${esc(x.why)}</div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('findings').innerHTML = (d.findings||[]).map(f =>
-    `<div class="card"><b>${esc(f.title)}</b><div style="font-size:13.6px;color:#475569;margin-top:6px">${esc(f.text)}</div></div>`
-  ).join('');
-
-  document.getElementById('todos').innerHTML = (d.todos||[]).map(t => {
-    const st = STATUS[t.status] || ['—','p-pending'];
-    return `<div class="todo"><span class="pill ${st[1]}">${st[0]}</span><span>${esc(t.task)}</span></div>`;
-  }).join('');
-
-  document.getElementById('links').innerHTML = (d.links||[]).map(l =>
-    `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)} ↗</a>`).join('');
-
-  applyFilter(currentFilter);
-}
-
-let currentFilter = 'all';
-function applyFilter(f){
-  currentFilter = f;
-  document.querySelectorAll('#exps .exp').forEach(e => {
-    e.style.display = (f === 'all' || e.getAttribute('data-k') === f) ? '' : 'none';
-  });
-}
-document.querySelectorAll('#filters button').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('#filters button').forEach(x => x.classList.remove('on'));
-  b.classList.add('on'); applyFilter(b.getAttribute('data-f'));
-}));
-
-function toggleAuto(){
-  auto = !auto;
-  document.getElementById('autobtn').textContent = '⏱ 自动刷新：' + (auto ? '开' : '关');
-  scheduleAuto();
-}
-function scheduleAuto(){
-  if(timer) clearInterval(timer);
-  if(auto) timer = setInterval(() => load(false), 5*60*1000);  // 5 分钟
-}
-
-/* ===== 结果文件（数据集）可视化与下载 ===== */
-let DATASETS = null;
-async function loadDatasets(){
-  const el = document.getElementById('datasets');
-  try{
-    const r = await fetch('./data/results/index.json?t=' + Date.now(), {cache:'no-store'});
-    if(!r.ok) throw new Error('HTTP ' + r.status);
-    DATASETS = await r.json();
-    renderDatasets();
-  }catch(e){
-    if(el) el.innerHTML = '<div class="banner">⚠️ 结果文件清单加载失败（' + esc(e.message) + '）</div>';
-  }
-}
-function fmt(v){
-  if(v === null || v === undefined || v === '') return '—';
-  if(typeof v === 'number'){
-    if(Number.isInteger(v) && Math.abs(v) < 100000) return String(v);
-    return (Math.abs(v) >= 100) ? v.toFixed(0) : v.toFixed(4);
-  }
-  return esc(v);
-}
-function barChart(viz, ds){
-  const ex = viz.exclude || [];
-  const rows = ds.rows.filter(r => typeof r[viz.valueKey] === 'number' && ex.indexOf(r[viz.labelKey]) < 0);
-  const max = Math.max.apply(null, rows.map(r => Math.abs(r[viz.valueKey])).concat([0.0001]));
-  return '<div class="chart"><div class="ct">' + esc(viz.title) + '</div>' + rows.map(r => {
-    const v = r[viz.valueKey];
-    const w = Math.max(2, Math.round(Math.abs(v) / max * 100));
-    const hot = v === max;
-    return '<div class="bar-row' + (hot ? ' hot' : '') + '">' +
-      '<div class="lbl"><span>' + esc(r[viz.labelKey]) + '</span><b>' + fmt(v) + '</b></div>' +
-      '<div class="bar-track"><i style="width:' + w + '%"></i></div></div>';
-  }).join('') + '</div>';
-}
-function dsTable(ds){
-  const cols = ds.columns;
-  const head = cols.map(c => '<th' + (c.num ? ' class="n"' : '') + '>' + esc(c.label) + '</th>').join('');
-  const body = ds.rows.map(r => '<tr>' + cols.map(c => '<td' + (c.num ? ' class="n"' : '') + '>' + fmt(r[c.key]) + '</td>').join('') + '</tr>').join('');
-  return '<div class="tblwrap"><table><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
-}
-function renderDatasets(){
-  if(!DATASETS) return;
-  document.getElementById('datasets').innerHTML = (DATASETS.datasets||[]).map(ds => {
-    const badges = (ds.experiments||[]).map(e => '<span class="badge">' + esc(e) + '</span>').join('');
-    const ph = ds.phase ? '<span class="badge ph">' + esc(ds.phase) + '</span>' : '';
-    const charts = (ds.viz||[]).filter(v => v.type === 'bar').map(v => barChart(v, ds)).join('');
-    const n = ds.rows.length;
-    return '<div class="ds">' +
-      '<div class="hd"><h3>' + esc(ds.title) + '</h3><div class="badges">' + ph + badges + '</div></div>' +
-      '<div class="d">' + esc(ds.desc) + '</div>' +
-      (charts ? '<div class="charts">' + charts + '</div>' : '') +
-      '<details class="tbl"><summary>查看数据表（' + n + ' 行 × ' + ds.columns.length + ' 列）</summary>' + dsTable(ds) + '</details>' +
-      '<div class="dl">' +
-        '<a class="json" href="./data/results/' + esc(ds.id) + '.json" download>⬇ 下载 JSON</a>' +
-        '<a class="csv" href="./data/results/' + esc(ds.id) + '.csv" download>⬇ 下载 CSV</a>' +
-        '<span class="raw">归属：' + esc(ds.phase||'') + ' · ' + (ds.experiments||[]).join(' / ') +
-        ' ｜ 文件：<code>docs/data/results/' + esc(ds.id) + '.{json,csv}</code></span>' +
-      '</div></div>';
-  }).join('');
-}
-
-load(false);
-loadDatasets();
-scheduleAuto();
-</script>
-</body>
-</html>
+</body></html>
