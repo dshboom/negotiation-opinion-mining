@@ -7,7 +7,7 @@ Qwen3 LoRA / QLoRA SFT —— 遵循 Qwen 官方 (qwen.readthedocs.io MS-SWIFT) 
     (= 官方 loss_scale ignore_empty_think)
   * LoRA target all-linear, alpha=2*r, dropout, warmup 5%, bf16, completions-only
 """
-import os, sys, json, argparse, time
+import os, sys, json, argparse, time, inspect
 # NOTE: do NOT use expandable_segments on this HAMi-virtualized GPU (VMM unsupported)
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
@@ -68,6 +68,9 @@ def main():
     ap.add_argument("--save-steps", type=int, default=150)
     ap.add_argument("--logging-steps", type=int, default=5)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--strict-data", action="store_true", help="拒绝超长/空样本，不静默过滤")
+    ap.add_argument("--warmup-ratio", type=float, default=0.05)
+    ap.add_argument("--init-adapter", default=None, help="continue SFT from an existing LoRA adapter")
     args = ap.parse_args()
 
     tok = AutoTokenizer.from_pretrained(args.model)
@@ -79,6 +82,9 @@ def main():
     before = len(ds)
     ds = ds.map(make_preprocess(tok, args.max_len), remove_columns=ds.column_names,
                 desc="tokenize")
+    lengths = [len(x) for x in ds['input_ids']]
+    if args.strict_data and any(n == 0 or n > args.max_len for n in lengths):
+        raise ValueError(f"invalid/oversize training samples; max={max(lengths)} limit={args.max_len}")
     ds = ds.filter(lambda x: len(x["input_ids"]) > 0 and len(x["input_ids"]) <= args.max_len)
     print(f"[data] kept {len(ds)}/{before} (max_len={args.max_len})", flush=True)
 
@@ -104,12 +110,16 @@ def main():
     if hasattr(model, "enable_input_require_grads"):
         model.enable_input_require_grads()
 
-    from peft import LoraConfig, get_peft_model
-    lconf = LoraConfig(r=args.lora_r, lora_alpha=args.lora_alpha,
-                       lora_dropout=args.lora_dropout, bias="none", task_type="CAUSAL_LM",
-                       target_modules=["q_proj","k_proj","v_proj","o_proj",
-                                       "gate_proj","up_proj","down_proj"])
-    model = get_peft_model(model, lconf)
+    from peft import LoraConfig, get_peft_model, PeftModel
+    if args.init_adapter:
+        # Continue training from an existing task adapter (e.g. RFT / preference warm start).
+        model = PeftModel.from_pretrained(model, args.init_adapter, is_trainable=True)
+    else:
+        lconf = LoraConfig(r=args.lora_r, lora_alpha=args.lora_alpha,
+                           lora_dropout=args.lora_dropout, bias="none", task_type="CAUSAL_LM",
+                           target_modules=["q_proj","k_proj","v_proj","o_proj",
+                                           "gate_proj","up_proj","down_proj"])
+        model = get_peft_model(model, lconf)
     model.print_trainable_parameters()
 
     targs = TrainingArguments(
@@ -117,7 +127,7 @@ def main():
         per_device_train_batch_size=args.bs,
         gradient_accumulation_steps=args.grad_accum,
         num_train_epochs=args.epochs, max_steps=args.max_steps,
-        learning_rate=args.lr, lr_scheduler_type="cosine", warmup_steps=0.05,
+        learning_rate=args.lr, lr_scheduler_type="cosine",
         weight_decay=0.01, max_grad_norm=1.0,
         bf16=True, tf32=True, gradient_checkpointing=True,
         logging_steps=args.logging_steps, save_steps=args.save_steps,
@@ -125,6 +135,8 @@ def main():
         dataloader_num_workers=2, remove_unused_columns=False, seed=args.seed,
         optim="adamw_torch",
         use_liger_kernel=args.liger,
+        **({'warmup_ratio': args.warmup_ratio} if 'warmup_ratio' in inspect.signature(TrainingArguments).parameters
+           else {'warmup_steps': args.warmup_ratio}),
     )
     trainer = Trainer(model=model, args=targs, train_dataset=ds,
                       data_collator=Collator(tok.pad_token_id),
@@ -136,9 +148,12 @@ def main():
         last = None
     if last:
         print("[resume] from", last, flush=True)
-    trainer.train(resume_from_checkpoint=last)
+    # Transformers 5 accepts fractional warmup_steps; older releases use warmup_ratio.
+    result = trainer.train(resume_from_checkpoint=last)
     trainer.save_model(args.out)
     tok.save_pretrained(args.out)
+    trainer.save_state()
+    trainer.save_metrics('train', result.metrics)
     print("[done] saved adapter to", args.out, flush=True)
 
 if __name__ == "__main__":
