@@ -1,12 +1,12 @@
 {
   "project": "谈判观点挖掘",
   "subtitle": "Negotiation Opinion Mining · Qwen3 长文观点抽取 + 未来表态预测",
-  "updated": "2026-10-02 22:35",
-  "best": "0.6082",
-  "best_label": "32B 综合分（val 300）",
+  "updated": "2026-10-03 12:32 CST（人工核验快照）",
+  "best": "0.5688",
+  "best_label": "本次L20已验证基线；新结构模型尚未评分",
   "kpis": [
-    { "label": "当前最佳（32B）", "value": "0.6082" },
-    { "label": "14B 最佳", "value": "0.5678" },
+    { "label": "历史32B（待核验）", "value": "0.6082" },
+    { "label": "本次14B基线", "value": "0.5688" },
     { "label": "相对基座提升", "value": "+0.217" },
     { "label": "vLLM 加速", "value": "8.7×" },
     { "label": "已归档实验", "value": "13" }
@@ -14,18 +14,21 @@
   "phases": [
     { "name": "环境与数据重建", "status": "done", "progress": 100, "detail": "venv + HF 栈 + vLLM 0.30 安装完成；数据 2400/300/300 就绪" },
     { "name": "模型下载（Qwen3-14B）", "status": "done", "progress": 100, "detail": "ModelScope 下载 27.5GB / 8 个 safetensors 完成" },
-    { "name": "r32 基线重训（2 轮）", "status": "doing", "progress": 4, "detail": "12/300 步，约 43 s/步，ETA ~3.5h" },
-    { "name": "val 评测 + ⑥ 立场校准", "status": "pending", "progress": 0, "detail": "vLLM 推理 → rescore → 重拟偏置 → 全量评分" },
-    { "name": "test 预测 → 提交文件", "status": "pending", "progress": 0, "detail": "产出 result_final.jsonl（300 条）" },
-    { "name": "Phase 2 字段加权重训", "status": "pending", "progress": 0, "detail": "issue_name ×2 / stance ×3 / future ×2，含无加权对照" }
+    { "name": "重建基线 + val校准评分", "status": "done", "progress": 100, "detail": "300篇完整评分；综合0.5688；不是历史0.5678" },
+    { "name": "S1 证据先行抽取SFT", "status": "done", "progress": 100, "detail": "2000条、2轮、250步；10:39完成，耗时2小时23分；尚未val评分" },
+    { "name": "B1 联合SFT公平对照", "status": "doing", "progress": 62, "detail": "12:32日志155/250步；同2000条fit，控制训练量影响；checkpoint150步" },
+    { "name": "S1 独立未来生成SFT", "status": "pending", "progress": 0, "detail": "9455条逐卡任务、2轮；B1完成后启动；未训练" },
+    { "name": "结构化全链路val验收", "status": "pending", "progress": 0, "detail": "待实现推理拼装；仅使用预测卡；新模型尚无成绩" },
+    { "name": "真实偏好对 → DPO/RFT", "status": "pending", "progress": 0, "detail": "300条偏好来源/100条确认，初始生成器仅用fit训练；尚未实现和启动" }
   ],
   "results": [
-    { "name": "Qwen3-14B 基座·零训练", "engine": "HF", "f1": 0.489, "alpha": 0.764, "extract": 0.373, "future": 0.263, "composite": 0.3511, "mark": "" },
+    { "name": "本次重建14B + ⑥校准", "engine": "vLLM+校准", "f1": 0.7387, "alpha": 0.8253, "extract": 0.6096, "future": 0.4054, "composite": 0.5688, "mark": "本次已验证基线" },
+    { "name": "Qwen3-14B 基座·零训练", "engine": "HF", "f1": 0.489, "alpha": 0.764, "extract": 0.373, "future": 0.263, "composite": 0.3511, "mark": "历史" },
     { "name": "SFT LoRA r16（2 轮）", "engine": "HF", "f1": 0.713, "alpha": 0.825, "extract": 0.588, "future": 0.398, "composite": 0.5498, "mark": "" },
     { "name": "SFT LoRA r32（2 轮）", "engine": "HF", "f1": 0.718, "alpha": 0.823, "extract": 0.591, "future": 0.399, "composite": 0.5527, "mark": "基线" },
     { "name": "+ vLLM 推理（8.7× 加速）", "engine": "vLLM", "f1": 0.720, "alpha": 0.823, "extract": 0.593, "future": 0.398, "composite": 0.5538, "mark": "" },
     { "name": "+ ⑥ 立场校准", "engine": "HF", "f1": 0.737, "alpha": 0.825, "extract": 0.608, "future": 0.408, "composite": 0.5678, "mark": "14B 最佳" },
-    { "name": "Qwen3-32B", "engine": "—", "f1": 0.773, "alpha": 0.849, "extract": 0.665, "future": 0.380, "composite": 0.6082, "mark": "★ 总最佳" },
+    { "name": "Qwen3-32B（历史待核验）", "engine": "—", "f1": 0.773, "alpha": 0.849, "extract": 0.665, "future": 0.380, "composite": 0.6082, "mark": "原始报告待核验" },
     { "name": "参照上界·答案照抄", "engine": "—", "f1": 1.0, "alpha": 1.0, "extract": 1.0, "future": 1.0, "composite": 1.0, "mark": "探针" },
     { "name": "参照·整篇原文当证据", "engine": "—", "f1": 0.98, "alpha": 0.677, "extract": 0.664, "future": 1.0, "composite": 0.7309, "mark": "探针" }
   ],
@@ -40,7 +43,7 @@
     { "id": "E8", "name": "prompt 追加指令", "status": "no", "gain": "−0.018", "params": "B1 概括命名 / B2 一卡一议题", "why": "固定 prompt 训练，加话属分布外扰动" },
     { "id": "E9", "name": "SC-merge 自一致性合并", "status": "no", "gain": "−0.043~−0.088", "params": "n=5, T=0.7, 聚类 thr 0.65/0.80, 频次≥2/3", "why": "偏差是系统性的，投票无法纠正" },
     { "id": "E10b", "name": "失败归因诊断", "status": "info", "gain": "方法论", "params": "复刻匹配逻辑逐张归因 + 命名口径分析", "why": "378 未匹配=194+101+64+19；145 张只差 0.05~0.10" },
-    { "id": "E11", "name": "字段加权重训", "status": "run", "gain": "待评", "params": "issue_name×2, stance×3, future×2, 3 轮", "why": "自定义加权交叉熵 + 1024 token 分块防 OOM" },
+    { "id": "E11", "name": "字段加权重训（暂停）", "status": "info", "gain": "未验收", "params": "旧实现字段解析待核查，不在当前队列", "why": "当前转向结构化SFT与真实偏好优化" },
     { "id": "E12", "name": "训练/推理模式对齐", "status": "info", "gain": "基础", "params": "enable_thinking=False；空 think 块不进 loss", "why": "对齐官方 ignore_empty_think" },
     { "id": "E13", "name": "Qwen3-32B", "status": "ok", "gain": "+0.0404", "params": "另一台机器复现", "why": "抽取明显变强（+0.057），但未来论点退步（−0.028）" }
   ],
@@ -50,13 +53,14 @@
     { "title": "错误是系统性的，不是随机噪声", "text": "同一题采样 5 次投票合并反而更差（−0.043）：偏差每次都朝同一方向，投票只能消除随机噪声——只能靠重训。" }
   ],
   "todos": [
-    { "task": "完成 r32 基线重训 + val 评测 + ⑥ 校准", "status": "doing" },
-    { "task": "产出可提交的 result_final.jsonl", "status": "pending" },
-    { "task": "Phase 2：字段加权重训（含无加权对照）", "status": "pending" },
+    { "task": "本次重建基线全量评分：0.5688", "status": "done" },
+    { "task": "完成B1联合对照与S1未来模块训练", "status": "doing" },
+    { "task": "结构化全链路评测，确认是否真实涨分", "status": "pending" },
     { "task": "32B：应用 ⑥ 校准 + 跑失败归因诊断", "status": "pending" },
-    { "task": "未来论点专项优化（32B 上仅 0.380，最大短板）", "status": "pending" }
+    { "task": "train内真实候选、偏好质检、DPO/RFT比较", "status": "pending" }
   ],
   "links": [
+    { "name": "当前L20研究动机与具体进度", "url": "https://github.com/dshboom/negotiation-opinion-mining/blob/main/docs/STRUCTURE_RUN_STATUS.md" },
     { "name": "GitHub 仓库", "url": "https://github.com/dshboom/negotiation-opinion-mining" },
     { "name": "详细演示页", "url": "./demo_detailed.html" },
     { "name": "精简演示页", "url": "./demo_overview.html" },

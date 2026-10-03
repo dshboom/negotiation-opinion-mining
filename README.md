@@ -7,6 +7,21 @@
 > 🌐 **实时进度站点（GitHub Pages）：https://dshboom.github.io/negotiation-opinion-mining/**
 > 数据源：`docs/data/progress.json`，日更新一条命令：`python scripts/update_progress.py --phase "..." --status doing --progress 40`
 
+> **双3090专项进度（2026-10-03）**：[`实验动机、配置、实际进度与初筛成绩`](docs/DUAL3090_PROGRESS.md)。已完成四组40步训练，S01/S02的60篇初筛综合分为0.4330/0.4049；其余结果待评测。仅为短跑探索，不与历史全量结果混算。
+> [双3090进度页面](https://dshboom.github.io/negotiation-opinion-mining/dual3090.html) · [汇总JSON](docs/data/dual3090.json)
+
+---
+
+## 当前研究主线与进度
+
+**2026-10-03 12:32（中国标准时间）核验：** L20证据先行抽取SFT已完成（2000条、2轮、250步，约2小时23分）；联合SFT公平对照训练到155/250步（62%）；独立未来生成排队。新结构模型尚无val成绩，DPO尚未启动。
+
+本次重建14B校准基线已全量评分：**综合0.5688、抽取0.6096、未来0.4054、F1 0.7387**。下方主结果表为历史实验，32B历史指标仍待原始报告核验，不与本次成绩混用。
+
+路线：**结构化SFT → 训练内真实候选 → 偏好数据质检 → DPO/RFT比较 → 完整val验收**。优先抽取是因为综合评分80%来自抽取；设置同2000条fit的联合对照，避免把训练数据量变化误认为任务结构收益。
+
+详细动机、逐阶段状态、划分和监控边界见 **[L20当前研究进度](docs/STRUCTURE_RUN_STATUS.md)**。GitHub展示的是已同步快照，不是秒级远端监控。原始预测、金标和适配器不公开。
+
 ---
 
 ## 任务定义
