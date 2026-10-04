@@ -262,3 +262,8 @@ P = NC/Np    R = NC/Ng    F1 = 2PR/(P+R)
 详见 [动机、配置、实际进度和初筛结果](docs/DUAL3090_PROGRESS.md)
 
 四组40步训练已完成；S01/S02固定60篇综合分0.4330/0.4049，证据先行字段顺序变体当前低于基线0.0281。S03预测中，S04待评测，S05训练29/40，S06待执行。短跑分数不是历史全量成绩；生成吞吐是当前瓶颈。
+
+
+## 冻结 system prompt（双3090）
+
+最终选定并冻结的基座 system prompt 与 300 篇验证结果：[T1_neutral_M56](docs/FROZEN_T1_SYSTEM_PROMPT.md)（可复制文本：[T1_system_prompt.txt](docs/data/T1_system_prompt.txt)）。
